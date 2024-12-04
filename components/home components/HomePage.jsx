@@ -162,7 +162,7 @@ const HomePage = () => {
                 refreshControl = {
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                 }
-                ref={scrollViewRef} onScroll={(event) => { event.persist(); handlescrollbottom(event) }} scrollEventThrottle={16} contentContainerStyle={{ paddingBottom: 10 }} >
+                ref={scrollViewRef} onScroll={(event) => { event.persist(); handlescrollbottom(event) }} scrollEventThrottle={16} contentContainerStyle={{ paddingBottom: 20 }} >
                 <HeaderDiv />
                 <PostsContainer postsList={postsList} />
                 {isAtBottom && <View>
