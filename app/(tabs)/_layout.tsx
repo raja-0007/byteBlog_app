@@ -7,6 +7,8 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Entypo from '@expo/vector-icons/Entypo';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import Octicons from '@expo/vector-icons/Octicons';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -20,16 +22,28 @@ export default function TabLayout() {
           title: 'Home',
           tabBarIcon: ({ color }) => <MaterialIcons name="home" size={24} color={color} />,
           headerShown:false
+          // headerTitle:'byteBLog'
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="newPost"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <Entypo name="paper-plane" size={24} color={color} />,
-          headerShown:false
+          title: 'new',
+          tabBarIcon: ({ color }) => <Octicons name="diff-added" size={24} color={color} />,
+          // headerShown:false
+          headerTitle:'new post'
         }}
       />
+      <Tabs.Screen
+        name="profile"
+        options={{
+          title: 'profile',
+          tabBarIcon: ({ color }) => <FontAwesome name="user-circle" size={24} color={color} />,
+          // headerShown:false
+          headerTitle:'profile'
+        }}
+      />
+      
     </Tabs>
   );
 }

@@ -1,9 +1,11 @@
 import { useThemeColor } from '@/hooks/useThemeColor'
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { RefreshControl, SafeAreaView, ScrollView, Text, View } from 'react-native'
 import HeaderDiv from '@/components/home components/HeaderDiv'
 import PostsContainer from '@/components/home components/PostsContainer'
 import uuid from 'react-native-uuid';
+import axios from 'axios'
+
 const HomePage = () => {
     const testList = [
         {
@@ -76,33 +78,53 @@ const HomePage = () => {
     
     setTimeout(() => {
       setRefreshing(false);
-      setPostsList((prevPostList) => [
-        {
-            post_id: uuid.v4(),
-            data: {
-                blog_title: 'title5',
-                description: 'Long description...',
-            },
-            user_id: 'user3',
-            username: 'username3',
-            img: 'sockets',
-            caption: 'caption3',
-            likes: ['user2', 'user3'],
-            comments: [{ user_id: 'user1', username: 'username1', comment: 'comment1 by user1' }],
-        },...prevPostList
+    //   setPostsList((prevPostList) => [
+    //     {
+    //         post_id: uuid.v4(),
+    //         data: {
+    //             blog_title: 'title5',
+    //             description: 'Long description...',
+    //         },
+    //         user_id: 'user3',
+    //         username: 'username3',
+    //         img: 'sockets',
+    //         caption: 'caption3',
+    //         likes: ['user2', 'user3'],
+    //         comments: [{ user_id: 'user1', username: 'username1', comment: 'comment1 by user1' }],
+    //     },...prevPostList
         
-    ])
+    // ])
+    getBlogs()
     }, 2000);
   }, []);
-    const [postsList, setPostsList] = useState(testList)
+    const [postsList, setPostsList] = useState([])
     const [isAtBottom, setIsAtBottom] = useState(false);
     const [isScrollEnabled, setIsScrollEnabled] = useState(true)
     const debounceTimer = useRef(null);
     const scrollViewRef = useRef(null)
+    const [scrollEnabled, setScrollEnabled] = useState(true)
+
+    const getBlogs=async()=>{
+        // console.log('calling')
+        const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/home`)
+        // console.log('home page blogs>> ',response.data)
+        setPostsList(response.data)
+    }
+
+    // console.log('postslistsss', postsList)
+    useEffect(()=>{
+        try{
+
+            getBlogs()
+        }
+        catch(err){
+            console.log('error in getting blogs', err)
+        }
+
+    },[])
     const handleScroll = ({ contentOffset, contentSize, layoutMeasurement }) => {
         //   const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
         const isBottom = contentOffset.y + layoutMeasurement.height >= contentSize.height - 10; // Add a small offset for precision
-        console.log('valueeeee ', isScrollEnabled, isAtBottom, isBottom)
         if (isBottom && !isAtBottom && isScrollEnabled) {
             setIsAtBottom(true);
             setIsScrollEnabled(false)
@@ -154,17 +176,19 @@ const HomePage = () => {
     }, 500), []);
 
 
-    console.log('scrolll ', isScrollEnabled)
+
+    // console.log('scrolll ', isScrollEnabled)
 
     return (
         <SafeAreaView>
-            <ScrollView
+            <ScrollView scrollEnabled={scrollEnabled}
                 refreshControl = {
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                 }
+                className='relative'
                 ref={scrollViewRef} onScroll={(event) => { event.persist(); handlescrollbottom(event) }} scrollEventThrottle={16} contentContainerStyle={{ paddingBottom: 20 }} >
                 <HeaderDiv />
-                <PostsContainer postsList={postsList} />
+                <PostsContainer scrollEnabled={scrollEnabled} setScrollEnabled={setScrollEnabled} postsList={postsList} />
                 {isAtBottom && <View>
                     <Text className='p-5 text-center'>loading...</Text>
                 </View>}
