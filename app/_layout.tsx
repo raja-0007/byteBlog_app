@@ -36,8 +36,10 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
+        <Stack.Screen name="messenger/index" options={{headerShown: false }} />
+        <Stack.Screen name="messenger/[chatPage]" options={{ headerShown: false }} />
       </Stack>
-      <StatusBar style="auto" />
+      <StatusBar style="dark" />
     </>
 
     // </ThemeProvider>

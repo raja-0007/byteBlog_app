@@ -7,12 +7,14 @@ import reduxLogo from '@/assets/images/redux.png'
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import CommentsDiv from '@/components/post components/CommentsDiv'
 import AllComments from '@/components/post components/AllComments'
+import axios from 'axios';
 const PostCard = ({ post, scrollEnabled, setScrollEnabled }) => {
     const [isDescription, setIsDescription] = useState(false)
     const [commentsList, setCommentsList] = useState(post.comments)
-
+    const currentUser = '123334343'
+    const [likes, setLikes] = useState(post.likes)
+    const [liked, setLiked] = useState(post.likes.find(like=>like.userId==currentUser))
     const titleRef = useRef(null)
-    const currentUser = 'user1'
     const [background, setBackground] = useState(true)
     const images = {
         redux: reduxLogo,
@@ -50,6 +52,16 @@ const PostCard = ({ post, scrollEnabled, setScrollEnabled }) => {
         }
 
     }
+
+    const likeHandler = async(action)=>{
+        await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/like`, {id:post._id, userId:currentUser, action})
+        .then((res)=>{
+            if(res.data.status == 'done'){
+                 setLiked(!liked)
+                 setLikes(res.data.likes)
+                }
+        })
+    }
     return (
         <View>
             <View className='p-5 border-y-2 border-gray-300 flex flex-row items-center gap-1 '>
@@ -80,8 +92,8 @@ const PostCard = ({ post, scrollEnabled, setScrollEnabled }) => {
             </TouchableOpacity>
             <View className=' px-5 py-3 gap-5 flex flex-row items-center'>
                 <View className='flex flex-row items-center gap-1'>
-                    {post.likes.includes(currentUser) ? <FontAwesome name="heart" size={20} color="#fb923c" /> : <FontAwesome5 name="heart" size={20} color="black" />}
-                    <Text>{post.likes.length} likes</Text>
+                    {liked ? <FontAwesome name="heart" size={20} color="#fb923c" onPress={()=>likeHandler('unlike')}/> : <FontAwesome5 name="heart" size={20} color="black" onPress={()=>likeHandler('like')} />}
+                    <Text>{likes.length} likes</Text>
                 </View>
                 <Pressable className='flex flex-row items-center gap-2'>
                     <FontAwesome5 name="comment-alt" size={20} color="black" />
