@@ -8,7 +8,7 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/useColorScheme';
 import '../global.css';
-
+import {UserProvider} from '@/hooks/useCurrentUser'
 
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -32,15 +32,18 @@ export default function RootLayout() {
 
   return (
     // <ThemeProvider >
-    <>
+    <UserProvider>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
         <Stack.Screen name="messenger/index" options={{headerShown: false }} />
         <Stack.Screen name="messenger/[chatPage]" options={{ headerShown: false }} />
+        <Stack.Screen name="authentication/login" options={{ headerShown: false }} />
+        <Stack.Screen name="authentication/register" options={{ headerShown: false }} />
+
       </Stack>
       <StatusBar style="dark" />
-    </>
+    </UserProvider>
 
     // </ThemeProvider>
   );
