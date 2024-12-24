@@ -7,9 +7,11 @@ import ChatFooter from '@/components/messenger components/ChatFooter'
 import Chatspace from '@/components/messenger components/Chatspace'
 import io from 'socket.io-client'; // Import socket.io-client
 import axios from 'axios'
+import { useUserContext } from '@/hooks/useCurrentUser'
+
 
 const chatPage = () => {
-  const currentUser = 'raja'
+  const {currentUser} = useUserContext()
   const { chatPage } = useLocalSearchParams()
   const [ws, setWs] = useState(null);
   const [isSocketDisconnected, setIsSocketDisconnected] = useState(true)
@@ -140,7 +142,7 @@ const chatPage = () => {
       // ws.emit('message', 'Hello from the client!');
       // ws.emit('message', { from: currentUser, to: chatPage, message: value, socketId: socketID });
       console.log('sending message')
-      await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/newMessage`,{ from: currentUser, to: chatPage, message: value, socketId: socketID })
+      await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/newMessage`,{ from: currentUser.username, to: chatPage, message: value, socketId: socketID })
       .then(res=>console.log('message sent'))
     // }
   };

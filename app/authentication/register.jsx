@@ -24,7 +24,7 @@ const Register = () => {
 
         setEmailError('');
 
-        const response = await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/signup`, { email: email.toLocaleLowerCase(), password })
+        const response = await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/signup`, { username: username.toLocaleLowerCase(), email: email.toLocaleLowerCase(), password })
         console.log(response.data)
         if (response.data.status !== 'signup successful') {
             alert(response.data.status)
@@ -42,7 +42,7 @@ const Register = () => {
             <TextInput
                 className="w-full p-3 border border-gray-300 rounded-lg mb-4"
                 placeholder="Username"
-                value={username}
+                value={username.toLocaleLowerCase()}
                 onChangeText={setUsername}
             />
             <TextInput

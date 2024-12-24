@@ -1,12 +1,14 @@
 import { View, Text, ScrollView, Pressable } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { FontAwesome } from '@expo/vector-icons'
+import { useUserContext } from '@/hooks/useCurrentUser'
 
 
 const Chatspace = ({ messages }) => {
   const [groupedMessages, setGroupedMessages] = useState({})
   const chatSpaceRef = useRef(null)
   const [isContentLoaded, setIsContentLoaded] = useState(false);
+  const { currentUser } = useUserContext()
 
   useEffect(() => {
 
@@ -17,22 +19,22 @@ const Chatspace = ({ messages }) => {
     }
   }, [messages])
 
-  useEffect(()=>{
+  useEffect(() => {
     if (chatSpaceRef && chatSpaceRef.current) {
       // setTimeout(() => {
-        chatSpaceRef.current.scrollToEnd({animated:false})
-        
+      chatSpaceRef.current.scrollToEnd({ animated: false })
+
       // }, 0.1);
     }
-    
-  },[groupedMessages])
+
+  }, [groupedMessages])
 
   const handleContentSizeChange = (contentWidth, contentHeight) => {
     if (contentHeight > 0 && !isContentLoaded) {
       setIsContentLoaded(true); // Set flag to indicate content is loaded
     }
   };
-  
+
 
   function groupChatsByDate(chats) {
     return chats.reduce((acc, chat) => {
@@ -46,7 +48,7 @@ const Chatspace = ({ messages }) => {
   }
 
   return (
-    <ScrollView  ref={chatSpaceRef} className='h-[84vh] relative flex flex-col gap-2 px-2' contentContainerStyle={{ paddingBottom: 20 }}>
+    <ScrollView ref={chatSpaceRef} className='h-[84vh] relative flex flex-col gap-2 px-2' contentContainerStyle={{ paddingBottom: 20 }}>
       {Object.keys(groupedMessages).map((date, di) => {
         return (
           <View className='flex flex-col gap-4 mt-7' key={di}>
@@ -58,11 +60,11 @@ const Chatspace = ({ messages }) => {
               }} className='bg-gray-500 text-white p-1 py-0 text-sm mx-auto rounded-md w-[max-content]'>{date}</Text>
               <View className='h-[1px] w-[35%] bg-gray-400'></View>
             </View>
-            
-            
+
+
             {groupedMessages[date].map((message, i) => {
               return (
-                <View key={i} className={` max-w-[70%] flex gap-1 items-end ${message.from == 'raja' ? 'self-end flex-row-reverse' : 'flex-row'}`}>
+                <View key={i} className={` max-w-[70%] flex gap-1 items-end ${message.from == currentUser.username ? 'self-end flex-row-reverse' : 'flex-row'}`}>
                   <FontAwesome name="user-circle" size={20} color="black" className='' />
                   <View className='bg-gray-200 p-2 rounded-md '><Text style={{
                     alignSelf: 'flex-start',
@@ -70,8 +72,8 @@ const Chatspace = ({ messages }) => {
                   }}
                     className='w-[max-content]'>{message.message}</Text>
                     <Text className='text-end self-end text-xs'>{message.sent_at}</Text>
-                    </View>
-                  
+                  </View>
+
                 </View>
               )
             })}
