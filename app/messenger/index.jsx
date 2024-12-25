@@ -10,9 +10,10 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import ChatHeader from '@/components/messenger components/ChatHeader'
 import axios from 'axios'
 import { useUserContext } from '@/hooks/useCurrentUser'
+import Octicons from '@expo/vector-icons/Octicons';
 
 const index = () => {
-    const {currentUser} = useUserContext()
+    const { currentUser } = useUserContext()
     const [friendsList, setFriendsList] = useState([
         {
             "userId": "user1",
@@ -55,24 +56,26 @@ const index = () => {
             }
         }
     ])
+    const [activeUsers, setActiveUsers] = useState([])
 
     const [chats, setChats] = useState([])
 
-    useEffect(()=>{
-        const getChats = async()=>{
+    useEffect(() => {
+        const getChats = async () => {
             console.log('currentuserrrrrrrrrrrrrrrrrrrrrrrrr', currentUser)
-        const chatList = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/getChats`,{
-            params: { username: currentUser.username }
-        })
-        console.log('chatLIst', chatList.data)
-        setChats(chatList.data)
-    }
+            const res = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/getChats`, {
+                params: { username: currentUser.username }
+            })
+            console.log('res for chatlists', res.data)
+            setChats(res.data.chatList)
+            setActiveUsers(res.data.activeUsers)
+        }
         getChats()
-    },[])
+    }, [])
     return (
         <SafeAreaWrapper>
             {/* <StatusBar style="auto" /> */}
-            <ChatHeader title={'messenger'} type={'messenger'}/>
+            <ChatHeader title={'messenger'} type={'messenger'} />
             {/* <View>search and chat</View> */}
             <View className='pt-2 px-5 flex flex-row items-center justify-start gap-1'>
                 <Text>recent chats</Text>
@@ -80,11 +83,15 @@ const index = () => {
             <ScrollView>
                 {chats.map((item, i) => {
                     return (
-                        <Pressable onPress={() => router.push(`/messenger/${item.participants.filter(x=>x!==currentUser.username)[0]}`)} key={i} className='px-5 py-4 border-b flex flex-row items-center justify-between border-gray-300'>
+                        <Pressable onPress={() => router.push(`/messenger/${item.participants.filter(x => x !== currentUser.username)[0]}`)} key={i} className='px-5 py-4 border-b flex flex-row items-center justify-between border-gray-300'>
                             <View className='flex flex-row gap-2 items-center'>
-                                <FontAwesome name="user-circle" size={32} color="gray" />
+                                <View className='relative'>
+                                    <FontAwesome name="user-circle" size={32} color="gray" />
+                                    {activeUsers.some(x => x.username == item.participants.filter(x => x !== currentUser.username)[0]) ? <Octicons name="dot-fill" size={24} color="#FFA500" className='absolute bottom-[-5px] right-[-1px]' /> : null
+                                    }                                
+                                    </View>
                                 <View >
-                                    <Text className='font-medium capitalize'>{item.participants.filter(x=>x!==currentUser.username)[0]}</Text>
+                                    <Text className='font-medium capitalize'>{item.participants.filter(x => x !== currentUser.username)[0]}</Text>
                                     <Text className='text-gray-500'>{item.lastMessage.message}</Text>
                                 </View>
 

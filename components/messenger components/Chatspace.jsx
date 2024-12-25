@@ -48,7 +48,7 @@ const Chatspace = ({ messages }) => {
         sortedAcc[date] = groupedChats[date];
         return sortedAcc;
       }, {});
-      console.log('sortedGroupedChatssortedGroupedChatssortedGroupedChatssortedGroupedChats',sortedGroupedChats)
+      // console.log('sortedGroupedChatssortedGroupedChatssortedGroupedChatssortedGroupedChats',sortedGroupedChats)
     return sortedGroupedChats;
   }
   function groupChatsByDate(chats, callback) {

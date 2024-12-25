@@ -32,6 +32,7 @@ const Login = () => {
         console.log(response.data)
         setCurrentUser(response.data)
         router.replace('(tabs)')
+        
       }
 
   };

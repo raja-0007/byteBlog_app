@@ -2,11 +2,13 @@ import { Image, StyleSheet, Platform, Text, View, SafeAreaView, StatusBar } from
 import HomePage from '@/components/home components/HomePage'
 import SafeAreaWrapper from '@/components/Layout wrappers/SafeAreaWrapper'
 import { useUserContext } from '@/hooks/useCurrentUser';
+import { useSocketContext } from '@/hooks/headSocket';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 export default function HomeScreen() {
   // console.log('staus ar', parseInt(StatusBar.currentHeight))
   const {currentUser} = useUserContext()
+  const { connectSocket} = useSocketContext()
   const [isMounted, setIsMounted] = useState(false);
 
   // Wait for the component to mount
@@ -18,6 +20,10 @@ export default function HomeScreen() {
   useEffect(() => {
     if (isMounted && !currentUser) {
       router.push('authentication/login');
+    }
+    else if(isMounted && currentUser){
+      console.log('calling to connect')
+      connectSocket(currentUser)
     }
   }, [currentUser, isMounted]);
 

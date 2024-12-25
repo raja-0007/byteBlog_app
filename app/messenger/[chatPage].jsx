@@ -8,18 +8,16 @@ import Chatspace from '@/components/messenger components/Chatspace'
 import io from 'socket.io-client'; // Import socket.io-client
 import axios from 'axios'
 import { useUserContext } from '@/hooks/useCurrentUser'
-
+import { useSocketContext } from '@/hooks/headSocket'
 
 const chatPage = () => {
-  const {currentUser} = useUserContext()
+  const { currentUser } = useUserContext()
+  const { ws, socketID, roomId } = useSocketContext()
   const { chatPage } = useLocalSearchParams()
-  const [ws, setWs] = useState(null);
   const [isSocketDisconnected, setIsSocketDisconnected] = useState(true)
   const [messages, setMessages] = useState([])
-  const [socketID, setSocketID] = useState(null)
-  const [roomId, setRoomId] = useState(null)
 
-  const getMessages = async()=>{
+  const getMessages = async () => {
     console.log('getting messages')
     setMessages([
       {
@@ -112,48 +110,30 @@ const chatPage = () => {
   useEffect(() => {
     getMessages()
 
-    if (!ws) {
-      const socket = io(process.env.EXPO_PUBLIC_BASE_URL, {
-        transports: ['websocket'],
-        forceNew: true,
-        reconnectionAttempts: 5,
-        timeout: 10000,
-      });
+    if (ws) {
+      ws.emit('joinChat', { user1Id: currentUser.username, user2Id: chatPage })
 
-      setWs(socket);
-
-      socket.on('connect', () => {
-        console.log('WebSocket connected')
-        socket.emit('joinChat',{user1Id: currentUser.username, user2Id: chatPage})
-      });
-      socket.on('yourSocketId', (socketId) => {
-        console.log('My socketId:', socketId);
-        setSocketID(socketId);
-        // You can now store this socketId on the client
-      });
-      socket.on('disconnect', () => console.log('Disconnected from server'));
-      socket.on('message', (data) => {
+      ws.on('message', (data) => {
         // console.log('Message from server:', data)
         if (data.status == 'message saved') {
           setMessages(data.newMessages)
         }
       });
-      socket.on('joinedChat',(data)=>{
-        setRoomId(data.roomId)
-      })
-      socket.on('connect_error', (err) => console.error('Connection error:', err));
+    }
 
-      return () => socket.disconnect(); // Cleanup
+    return () => {
+      ws.emit('leaveChat', { roomId })
     }
   }, []);
 
-  const sendMessage = async(value) => {
+
+  const sendMessage = async (value) => {
     // if (ws) {
-      // ws.emit('message', 'Hello from the client!');
-      // ws.emit('message', { from: currentUser, to: chatPage, message: value, socketId: socketID });
-      console.log('sending message')
-      await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/newMessage`,{ from: currentUser.username, to: chatPage, roomId: roomId, message: value, socketId: socketID })
-      .then(res=>console.log('message sent'))
+    // ws.emit('message', 'Hello from the client!');
+    // ws.emit('message', { from: currentUser, to: chatPage, message: value, socketId: socketID });
+    console.log('sending message')
+    await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/newMessage`, { from: currentUser.username, to: chatPage, roomId: roomId, message: value, socketId: socketID })
+      .then(res => console.log('message sent'))
     // }
   };
 
