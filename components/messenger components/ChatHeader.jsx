@@ -3,12 +3,19 @@ import React from 'react'
 import { router } from 'expo-router'
 import { FontAwesome, FontAwesome6, Ionicons } from '@expo/vector-icons'
 import SimpleLineIcons from '@expo/vector-icons/SimpleLineIcons';
+import Octicons from '@expo/vector-icons/Octicons';
 
-const ChatHeader = ({ title, type, sendMessage }) => {
+
+const ChatHeader = ({ title, type, active, sendMessage }) => {
     return (
         <View className={`px-5 ${type == 'chat' ? 'h-[7vh]' : 'py-4'} flex flex-row items-center gap-3 border-b-2 border-gray-300`} >
             {type == 'messenger' ? <FontAwesome6 onPress={() => router.back()} name="facebook-messenger" size={24} color="black" />
-                : <FontAwesome name="user-circle" size={24} color="black" />
+                : 
+                <View className='relative'>
+                    <FontAwesome name="user-circle" size={24} color="black" />
+                    {active ? <Octicons name="dot-fill" size={24} color="#FFA500" className='absolute bottom-[-5px] right-[-1px]' /> : null
+                                    }
+                    </View>
 
             }
             {/* <Ionicons onPress={() => router.back()} name="arrow-back" size={24} color="black" /> */}

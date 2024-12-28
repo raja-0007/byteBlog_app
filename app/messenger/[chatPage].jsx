@@ -11,7 +11,7 @@ import { useUserContext } from '@/hooks/useCurrentUser'
 import { useSocketContext } from '@/hooks/headSocket'
 
 const chatPage = () => {
-  const { currentUser } = useUserContext()
+  const { currentUser, activeUsers } = useUserContext()
   const { ws, socketID, roomId } = useSocketContext()
   const { chatPage } = useLocalSearchParams()
   const [isSocketDisconnected, setIsSocketDisconnected] = useState(true)
@@ -137,10 +137,12 @@ const chatPage = () => {
     // }
   };
 
+  console.log('active user testtttttttttttt>>>>>>>>>>>>>>>.',activeUsers, chatPage, activeUsers.some(x => x.username !== chatPage) )
+
   return (
     <SafeAreaWrapper>
       <View className='flex-1 relative'>
-        <ChatHeader title={chatPage} sendMessage={sendMessage} type={'chat'} />
+        <ChatHeader title={chatPage} active={activeUsers.some(x => x.username == chatPage)} sendMessage={sendMessage} type={'chat'} />
         <Chatspace messages={messages} />
         <ChatFooter sendMessage={sendMessage} />
       </View>
