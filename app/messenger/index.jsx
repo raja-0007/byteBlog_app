@@ -103,20 +103,46 @@ const index = () => {
             {/* <StatusBar style="auto" /> */}
             <ChatHeader title={'messenger'} type={'messenger'} />
             {/* <View>search and chat</View> */}
-            <View className='px-5 py-2 relative'>
-                <Searchbar
-                    placeholder="Search chat"
-                    onChangeText={setSearchQuery}
-                    value={searchQuery}
-                />
-                {allUsers.length>0 && searchQuery !== '' ? <ScrollView ref={usersRef} className='absolute top-14 left-[10%] bg-white w-[90%] max-h-[400px] overflow-auto border-gray-300'
-                style={{ backgroundColor: 'white', elevation: 5, zIndex:1000 }}>
-                    {allUsers.filter(x => x.username.includes(searchQuery.toLocaleLowerCase()) && x.username !== currentUser.username).map((item, i)=>(
-                        <Text onPress={()=>{setSearchQuery(item.username); router.push(`/messenger/${item.username}`)}} className='p-3 border-b border-gray-300' key={i}>{item.username}</Text>
-                    ))}
-                </ScrollView>:null}
+            <View className="px-5 py-2 relative">
+  <Searchbar
+    placeholder="Search chat"
+    onChangeText={setSearchQuery}
+    value={searchQuery}
+    style={{
+      backgroundColor: "#ebedef", // Light gray background
+    //   border:'2px solid black',
+    //   borderRadius: 8, // Rounded corners for a modern look
+      paddingHorizontal: 10, // Additional padding for inner spacing
+    }}
+  />
+  {allUsers.length > 0 && searchQuery !== "" ? (
+    <ScrollView
+      ref={usersRef}
+      className="absolute top-16 left-1/2 transform -translate-x-1/2 bg-white w-[90%] max-h-[400px] border border-gray-200 rounded-lg shadow-lg overflow-auto z-50"
+    >
+      {allUsers
+        .filter(
+          (x) =>
+            x.username.includes(searchQuery.toLocaleLowerCase()) &&
+            x.username !== currentUser.username
+        )
+        .map((item, i) => (
+          <Text
+            onPress={() => {
+              setSearchQuery("");
+              router.push(`/messenger/${item.username}`);
+            }}
+            className="p-4 border-b border-gray-200 flex items-center gap-2 text-gray-700"
+            key={i}
+          >
+            <FontAwesome name="user-circle" size={15} color="gray" />
+            {item.username}
+          </Text>
+        ))}
+    </ScrollView>
+  ) : null}
+</View>
 
-                </View>
             <View className='pt-2 px-5 flex flex-row items-center justify-start gap-1'>
                 <Text>recent chats</Text>
                 <MaterialCommunityIcons name="sort-reverse-variant" size={14} color="black" /></View>
