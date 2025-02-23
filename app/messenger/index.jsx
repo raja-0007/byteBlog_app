@@ -123,7 +123,7 @@ const index = () => {
       {allUsers
         .filter(
           (x) =>
-            x.username.includes(searchQuery.toLocaleLowerCase()) &&
+            x.username.toLocaleLowerCase().includes(searchQuery.toLocaleLowerCase()) &&
             x.username !== currentUser.username
         )
         .map((item, i) => (
@@ -132,7 +132,7 @@ const index = () => {
               setSearchQuery("");
               router.push(`/messenger/${item.username}`);
             }}
-            className="p-4 border-b border-gray-200 flex items-center gap-2 text-gray-700"
+            className="p-4 border-b z-50 border-gray-200 flex items-center gap-2 text-gray-700"
             key={i}
           >
             <FontAwesome name="user-circle" size={15} color="gray" />

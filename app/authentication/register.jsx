@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { router } from 'expo-router';
 import axios from 'axios';
 import { useUserContext } from '@/hooks/useCurrentUser';
-
+import { LinearGradient } from 'expo-linear-gradient';
 
 const Register = () => {
     const navigation = useNavigation();
@@ -38,6 +38,19 @@ const Register = () => {
 
     return (
         <View className="flex-1 justify-center items-center px-5 bg-white">
+            <LinearGradient
+        colors={['white','pink', 'orange']} // Pink to Blue Gradient
+        style={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          top: 0,
+          height: '100%',
+          zIndex: 0,
+        }}
+        start={{ x: 0, y: 0.7 }} // Gradient starts from top-left
+        end={{ x: 0, y: 1.5 }}   // Ends at bottom-right
+      />
             <Text className="text-2xl font-bold text-black mb-5">Register</Text>
             <TextInput
                 className="w-full p-3 border border-gray-300 rounded-lg mb-4"
