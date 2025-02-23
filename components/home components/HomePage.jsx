@@ -5,6 +5,7 @@ import HeaderDiv from '@/components/home components/HeaderDiv'
 import PostsContainer from '@/components/home components/PostsContainer'
 import uuid from 'react-native-uuid';
 import axios from 'axios'
+import { useFocusEffect } from "@react-navigation/native";
 
 const HomePage = () => {
     const testList = [
@@ -107,21 +108,19 @@ const HomePage = () => {
     const getBlogs=async()=>{
         // console.log('calling')
         const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/home`)
-        // console.log('home page blogs>> ',response.data)
+        console.log('home page blogs>> ',response.data)
         setPostsList(response.data)
     }
 
     // console.log('postslistsss', postsList)
-    useEffect(()=>{
-        try{
-
-            getBlogs()
-        }
-        catch(err){
-            console.log('error in getting blogs', err)
-        }
-
-    },[])
+    useFocusEffect(
+        useCallback(() => {
+          getBlogs(); // Runs when the tab is focused
+    
+          return () => {
+            console.log("Tab Unfocused"); // Optional cleanup
+          };
+        }, []))
     const handleScroll = ({ contentOffset, contentSize, layoutMeasurement }) => {
         //   const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
         const isBottom = contentOffset.y + layoutMeasurement.height >= contentSize.height - 10; // Add a small offset for precision

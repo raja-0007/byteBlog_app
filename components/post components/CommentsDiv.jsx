@@ -90,11 +90,11 @@ const CommentsDiv = ({ commentsList, setCommentsList, postAuthor, blogId, scroll
         </ScrollView>
             <View className={`${viewAll ? '' : ''} w-full mt-2`}>
                 <View className='flex w-full px-3 flex-row gap-4 justify-start'>
-                    <Pressable onPress={viewAllComments}><Text>{viewAll ? 'view less' : 'view all'}</Text></Pressable>
+                {commentsList.length !==0 && <Pressable onPress={viewAllComments}><Text>{viewAll ? 'view less' : 'view all'}</Text></Pressable>}
                     {!viewAll && <Pressable onPress={() => { setIsNewComment(!isNewComment) }}><Text>{!isNewComment ? 'add comment' : 'cancel'}</Text></Pressable>}
                 </View>
 
-                {(isNewComment || viewAll) && <View className={` flex  flex-col gap-0 mt-3`}>
+                {(isNewComment || viewAll ) && <View className={` flex  flex-col gap-0 mt-3`}>
                     <View className='px-3 flex flex-row items-center justify-center  gap-3'>
                         <TextInput multiline returnKeyType='send' value={comment} onChangeText={setComment} placeholder={`comment...`} className='border rounded-md border-gray-300 w-[90%] h-12' />
                         <MaterialCommunityIcons name="send" size={24} color="black" onPress={submitComment} />

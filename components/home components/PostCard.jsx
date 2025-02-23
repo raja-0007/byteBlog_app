@@ -106,17 +106,17 @@ const PostCard = ({ post, scrollEnabled, setScrollEnabled }) => {
             </View>}
             {/* {isComments &&  */}
             {/* {scrollEnabled ?  */}
-            {commentsList.length !== 0 ? 
+            {/* {commentsList.length !== 0 ?  */}
+            { commentsList.length == 0 &&(
+               <View className='px-5 pb-3 '>
+                 <Text className='text-[12px] text-gray-600'>no comments yet</Text>
+               </View>
+            )}
             <CommentsDiv 
             scrollEnabled={scrollEnabled} postAuthor={post.username} 
             setScrollEnabled={setScrollEnabled} commentsList={commentsList}
              setCommentsList={setCommentsList} blogId={post._id} />
-             :(
-                <View className='px-5 pb-3 '>
-                  <Text className='text-[12px] text-gray-600'>no comments yet</Text>
-                </View>
-              )
-}            
+            
 {/* :<AllComments scrollEnabled={scrollEnabled} setScrollEnabled={setScrollEnabled} commentsList={commentsList} setCommentsList={setCommentsList} blogId={post._id} />
               } */}
         </View>

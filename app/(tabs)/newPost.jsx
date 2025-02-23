@@ -5,6 +5,7 @@ import AddImage from '@/components/new post components/AddImage'
 import AddText from '@/components/new post components/AddText'
 import Entypo from '@expo/vector-icons/Entypo';
 import axios from 'axios'
+import { router } from 'expo-router'
 
 
 export default function newPost() {
@@ -44,7 +45,27 @@ export default function newPost() {
         'Content-Type': 'multipart/form-data',
     },
     })
-    .then(res=>console.log('res', res.data))
+    .then(res=>{
+      console.log('res', res.data)
+      router.push('/')
+      setPostData({
+        title:'',
+        caption:'',
+        description:'',
+        content:''
+      })
+      setImage(null)
+    })
+    .catch(err=>{
+      console.log(err)
+      setPostData({
+        title:'',
+        caption:'',
+        description:'',
+        content:''
+      })
+      setImage(null)
+    })
   }
   return (
     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
