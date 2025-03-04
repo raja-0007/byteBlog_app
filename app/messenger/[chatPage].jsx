@@ -147,13 +147,13 @@ const chatPage = () => {
     // if (ws) {
     // ws.emit('message', 'Hello from the client!');
     // ws.emit('message', { from: currentUser, to: chatPage, message: value, socketId: socketID });
-    console.log('sending message')
+    // console.log('sending message', currentUser.username, chatPage, roomId, value, socketID)
     await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/newMessage`, { from: currentUser.username, to: chatPage, roomId: roomId, message: value, socketId: socketID })
       .then(res => console.log('message sent'))
     // }
   };
 
-  console.log('active user testtttttttttttt>>>>>>>>>>>>>>>.',activeUsers, chatPage, activeUsers.some(x => x.username !== chatPage) )
+  // console.log('active user testtttttttttttt>>>>>>>>>>>>>>>.',activeUsers, chatPage, activeUsers.some(x => x.username !== chatPage) )
 
   return (
     <SafeAreaWrapper>

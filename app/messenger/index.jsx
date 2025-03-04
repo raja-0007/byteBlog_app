@@ -71,7 +71,7 @@ const index = () => {
                 const res = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/getChats`, {
                     params: { username: currentUser.username }
                 })
-                console.log('res for chatlists', res.data)
+                // console.log('res for chatlists', res.data)
                 setChats(res.data.chatList)
                 setAllUsers(res.data.allUsers)
 
@@ -118,8 +118,23 @@ const index = () => {
   {allUsers.length > 0 && searchQuery !== "" ? (
     <ScrollView
       ref={usersRef}
-      className="absolute top-16 left-1/2 transform -translate-x-1/2 bg-white w-[90%] max-h-[400px] border border-gray-200 rounded-lg shadow-lg overflow-auto z-50"
-    >
+      style={{
+        position: "absolute",
+        top: 60, // Adjust for visibility
+        left: "5%", // Centered more effectively
+        width: "100%", 
+        maxHeight: 400,
+        backgroundColor: "white",
+        borderWidth: 1,
+        borderColor: "#ddd",
+        borderRadius: 10,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+        elevation: 5, // For Android shadows
+        zIndex: 1000, // Ensure visibility
+      }}    >
       {allUsers
         .filter(
           (x) =>
