@@ -8,12 +8,14 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import CommentsDiv from '@/components/post components/CommentsDiv'
 import AllComments from '@/components/post components/AllComments'
 import axios from 'axios';
+import { router } from 'expo-router';
+import { useUserContext } from '@/hooks/useCurrentUser';
 const PostCard = ({ post, scrollEnabled, setScrollEnabled }) => {
     const [isDescription, setIsDescription] = useState(false)
     const [commentsList, setCommentsList] = useState(post.comments)
-    const currentUser = '123334343'
-    const [likes, setLikes] = useState(post.likes)
-    const [liked, setLiked] = useState(post.likes.find(like=>like.userId==currentUser))
+    const {currentUser} = useUserContext() 
+       const [likes, setLikes] = useState(post.likes)
+    const [liked, setLiked] = useState(post.likes.find(like=>like.userId==currentUser.email))
     const titleRef = useRef(null)
     const [background, setBackground] = useState(true)
     const images = {
@@ -54,7 +56,7 @@ const PostCard = ({ post, scrollEnabled, setScrollEnabled }) => {
     }
 
     const likeHandler = async(action)=>{
-        await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/like`, {id:post._id, userId:currentUser, action})
+        await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/like`, {id:post._id, userId:currentUser.email, action})
         .then((res)=>{
             if(res.data.status == 'done'){
                  setLiked(!liked)
@@ -83,8 +85,8 @@ const PostCard = ({ post, scrollEnabled, setScrollEnabled }) => {
                             </View>
 
                             {isDescription && <View className='flex flex-col mt-10 gap-3 items-end justify-end w-full'>
-                                <Text className='text-white text-xl leading-5 '>{post.description}</Text>
-                                <Text className='text-end self-end w-[max-content] bg-slate-500 p-1 px-2 rounded-md text-white'>view blog</Text>
+                                <Text className='text-white text-xl leading-5 '>{post.description.slice(0, 300)}{post.description.length > 300 && '...'}</Text>
+                                <Text onPress={()=>router.push(`/post_page/${post._id}`)} className='text-end self-end w-[max-content] bg-slate-500 p-1 px-2 rounded-md text-white'>view blog</Text>
                             </View>}
                         </>}
 

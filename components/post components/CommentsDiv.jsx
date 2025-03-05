@@ -45,7 +45,7 @@ const CommentsDiv = ({ commentsList, setCommentsList, postAuthor, blogId, scroll
             setCommentsList([...commentsList, ...response.data])
         }
         else {
-            setCommentsList(commentsList.slice(0, 2))
+            setCommentsList(commentsList?.slice(0, 2))
         }
         setViewAll(!viewAll)
         // setScrollEnabled(!scrollEnabled)
@@ -90,7 +90,7 @@ const CommentsDiv = ({ commentsList, setCommentsList, postAuthor, blogId, scroll
         </ScrollView>
             <View className={`${viewAll ? '' : ''} w-full mt-2`}>
                 <View className='flex w-full px-3 flex-row gap-4 justify-start'>
-                {commentsList.length !==0 && <Pressable onPress={viewAllComments}><Text>{viewAll ? 'view less' : 'view all'}</Text></Pressable>}
+                {commentsList?.length !==0 && <Pressable onPress={viewAllComments}><Text>{viewAll ? 'view less' : 'view all'}</Text></Pressable>}
                     {!viewAll && <Pressable onPress={() => { setIsNewComment(!isNewComment) }}><Text>{!isNewComment ? 'add comment' : 'cancel'}</Text></Pressable>}
                 </View>
 
