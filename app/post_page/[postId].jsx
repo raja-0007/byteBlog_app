@@ -4,7 +4,7 @@ import { useLocalSearchParams } from 'expo-router'
 import axios from 'axios'
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons'
 import { useUserContext } from '@/hooks/useCurrentUser';
-import CommentsDiv from '@/components/post components/CommentsDiv'
+import CommentsDiv from '@/components/post_page_components/PostComments'
 
 const PostPage = () => {
     const { postId } = useLocalSearchParams()
@@ -13,6 +13,7 @@ const PostPage = () => {
     const [commentsList, setCommentsList] = useState(null)
     const [likes, setLikes] = useState(null)
     const [liked, setLiked] = useState(null)
+    const [commentsCount, setCommentsCount] = useState(null)
 
     const getPostById = async () => {
         try {
@@ -22,11 +23,12 @@ const PostPage = () => {
                 }
             })
 
-            console.log('responseeeeeeeeeee', res.data, res.data.image)
+            // console.log('responseeeeeeeeeee', res.data, res.data.image)
             setBlog(res.data)
             setLiked(res.data.likes.find(like => like.userId == currentUser.email))
             setLikes(res.data.likes)
             setCommentsList(res.data.comments)
+            setCommentsCount(res.data.commentsCount)
         }
         catch (err) {
             console.log('err in getting post')
@@ -34,13 +36,14 @@ const PostPage = () => {
     }
 
     const likeHandler = async (action) => {
-        await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/like`, { id: post._id, userId: currentUser.email, action })
-            .then((res) => {
-                if (res.data.status == 'done') {
-                    setLiked(!liked)
-                    setLikes(res.data.likes)
+        await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/like`, {id:blog._id, userId:currentUser.email, action})
+        .then((res)=>{
+            if(res.data.status == 'done'){
+                 setLiked(!liked)
+                 setLikes(res.data.likes)
                 }
-            })
+        })
+
     }
 
     useEffect(() => {
@@ -50,36 +53,64 @@ const PostPage = () => {
 
 
     return (
-        <SafeAreaView>
-            <ScrollView>
-                <Text className='py-3 font-semibold text-lg px-5'>{blog?.title}</Text>
-                <Image source={{ uri: `${process.env.EXPO_PUBLIC_BASE_URL}/images/${blog?.image}` }} className='w-full h-[400px] object-contain' />
-                <View className='p-4'>
-                    <Text className=' font-semibold text-lg'>Description</Text>
-                    <Text>{blog?.description}</Text>
-                </View>
-                <View className='p-4'>
-                    <Text className=' font-semibold text-lg'>Content</Text>
-                    <Text>{blog?.content}</Text>
+        <SafeAreaView className="flex-1 bg-white">
+            <ScrollView showsVerticalScrollIndicator={false}>
+                {/* Blog Title */}
+                <Text className="py-4 font-bold text-xl text-gray-800 px-5">{blog?.title}</Text>
+
+                {/* Blog Image */}
+                <Image
+                    source={{ uri: `${process.env.EXPO_PUBLIC_BASE_URL}/images/${blog?.image}` }}
+                    className="w-full h-[400px] rounded-lg"
+                    style={{ resizeMode: "cover" }}
+                />
+
+                {/* Blog Description */}
+                <View className="p-5">
+                    <Text className="font-bold text-lg text-gray-900">Description</Text>
+                    <Text className="text-gray-600 text-base leading-relaxed">{blog?.description}</Text>
                 </View>
 
-                <View className=' px-5 py-3 gap-5 flex flex-row items-center'>
-                    <View className='flex flex-row items-center gap-1'>
-                        {liked ? <FontAwesome name="heart" size={20} color="#fb923c" onPress={() => likeHandler('unlike')} /> : <FontAwesome5 name="heart" size={20} color="black" onPress={() => likeHandler('like')} />}
-                        <Text>{likes?.length} likes</Text>
-                    </View>
-                    <Pressable className='flex flex-row items-center gap-2'>
-                        <FontAwesome5 name="comment-alt" size={20} color="black" />
-                        <Text>{blog?.comments?.length} comments</Text>
+                {/* Blog Content */}
+                <View className="p-5">
+                    <Text className="font-bold text-lg text-gray-900">Content</Text>
+                    <Text className="text-gray-600 text-base leading-relaxed">{blog?.content}</Text>
+                </View>
 
+                {/* Like & Comment Section */}
+                <View className="px-5 py-4 flex flex-row items-center justify-between border-t border-gray-300">
+                    {/* Like Button */}
+                    <Pressable
+                        className="flex flex-row items-center gap-2"
+                        onPress={() => likeHandler(liked ? 'unlike' : 'like')}
+                    >
+                        {liked ?
+                            <FontAwesome name="heart" size={22} color="#fb923c" /> :
+                            <FontAwesome5 name="heart" size={22} color="black" />}
+                        <Text className="text-gray-800 font-medium">{likes?.length} Likes</Text>
+                    </Pressable>
+
+                    {/* Comment Button */}
+                    <Pressable className="flex flex-row items-center gap-2">
+                        <FontAwesome5 name="comment-alt" size={22} color="black" />
+                        <Text className="text-gray-800 font-medium">{commentsCount} Comments</Text>
                     </Pressable>
                 </View>
-                <CommentsDiv
-                    postAuthor={blog?.username}
-                    commentsList={commentsList}
-                    setCommentsList={setCommentsList} blogId={blog?._id} />
+
+                {/* Comments Section */}
+                <View className="p-2">
+                    <CommentsDiv
+                        postAuthor={blog?.username}
+                        commentsList={commentsList}
+                        setCommentsList={setCommentsList}
+                        blogId={blog?._id}
+                        commentsCount={commentsCount}
+                        setCommentsCount={setCommentsCount}
+                    />
+                </View>
             </ScrollView>
         </SafeAreaView>
+
     )
 }
 

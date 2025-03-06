@@ -13,6 +13,7 @@ import { useUserContext } from '@/hooks/useCurrentUser';
 const PostCard = ({ post, scrollEnabled, setScrollEnabled }) => {
     const [isDescription, setIsDescription] = useState(false)
     const [commentsList, setCommentsList] = useState(post.comments)
+    const [commentsCount, setCommentsCount] = useState(post.commentsCount)
     const {currentUser} = useUserContext() 
        const [likes, setLikes] = useState(post.likes)
     const [liked, setLiked] = useState(post.likes.find(like=>like.userId==currentUser.email))
@@ -34,6 +35,14 @@ const PostCard = ({ post, scrollEnabled, setScrollEnabled }) => {
             }
         }
     }, [])
+
+    useEffect(()=>{
+        setCommentsCount(post.commentsCount)
+        setCommentsList(post.comments)
+        setLikes(post.likes)
+        setLiked(post.likes.find(like=>like.userId==currentUser.email))
+        
+    },[post])
 
     const handleclick = (e) => {
         setBackground(!background)
@@ -99,7 +108,7 @@ const PostCard = ({ post, scrollEnabled, setScrollEnabled }) => {
                 </View>
                 <Pressable className='flex flex-row items-center gap-2'>
                     <FontAwesome5 name="comment-alt" size={20} color="black" />
-                    <Text>{post.comments.length} comments</Text>
+                    <Text>{commentsCount} comments</Text>
 
                 </Pressable>
             </View>
@@ -117,7 +126,7 @@ const PostCard = ({ post, scrollEnabled, setScrollEnabled }) => {
             <CommentsDiv 
             scrollEnabled={scrollEnabled} postAuthor={post.username} 
             setScrollEnabled={setScrollEnabled} commentsList={commentsList}
-             setCommentsList={setCommentsList} blogId={post._id} />
+             setCommentsList={setCommentsList} setCommentsCount={setCommentsCount} commentsCount={commentsCount} blogId={post._id} />
             
 {/* :<AllComments scrollEnabled={scrollEnabled} setScrollEnabled={setScrollEnabled} commentsList={commentsList} setCommentsList={setCommentsList} blogId={post._id} />
               } */}

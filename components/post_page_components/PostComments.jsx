@@ -5,10 +5,11 @@ import { Pressable, Text, TextInput, View } from 'react-native'
 import { ScrollView } from 'react-native'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useUserContext } from '@/hooks/useCurrentUser';
+
 import axios from 'axios'
 import uuid from 'react-native-uuid';
-import { useUserContext } from '@/hooks/useCurrentUser';
-const CommentsDiv = ({ commentsList, setCommentsList, postAuthor, commentsCount, setCommentsCount, blogId, scrollEnabled, setScrollEnabled }) => {
+const CommentsDiv = ({ commentsList, setCommentsList, commentsCount, setCommentsCount, postAuthor, blogId, scrollEnabled, setScrollEnabled }) => {
     const [isReply, setIsReply] = useState('')
     const name = '1234567890'
     const { currentUser } = useUserContext()
@@ -33,9 +34,9 @@ const CommentsDiv = ({ commentsList, setCommentsList, postAuthor, commentsCount,
                 .then(res => {
                     // console.log('comment res>>', res.data.newComments, commentsList)
                     setCommentsList([...res.data.newComments, ...commentsList])
-                    setCommentsCount(res.data.commentsCount)
                     setComment('')
                     setIsNewComment(false)
+                    setCommentsCount(res.data.commentsCount)
                 })
         }
     }
@@ -59,7 +60,8 @@ const CommentsDiv = ({ commentsList, setCommentsList, postAuthor, commentsCount,
     }
 
     return (
-        <View className={`${viewAll ? ' h-[300px]' : 'h-auto'} relative px-5 pb-3`}><ScrollView className={`w-full   pt-0 flex flex-col  gap-5 `}
+        <View className={`${viewAll ? ' h-[300px]' : 'h-auto'} relative px-5 pb-10`}>
+        <ScrollView className={`w-full   pt-0 flex flex-col gap-5 `}
             nestedScrollEnabled
             contentContainerStyle={{ flexGrow: 1 }}
         >

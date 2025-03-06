@@ -108,7 +108,7 @@ const HomePage = () => {
     const getBlogs=async()=>{
         // console.log('calling')
         const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/home`)
-        // console.log('home page blogs>> ',response.data)
+        console.log('home page blogs>> ',response.data)
         setPostsList(response.data)
     }
 
