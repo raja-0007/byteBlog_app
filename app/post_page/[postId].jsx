@@ -2,7 +2,7 @@ import { View, Text, SafeAreaView, Image, ScrollView, Pressable } from 'react-na
 import React, { useEffect, useState } from 'react'
 import { useLocalSearchParams } from 'expo-router'
 import axios from 'axios'
-import { FontAwesome, FontAwesome5 } from '@expo/vector-icons'
+import { FontAwesome, FontAwesome5, FontAwesome6 } from '@expo/vector-icons'
 import { useUserContext } from '@/hooks/useCurrentUser';
 import CommentsDiv from '@/components/post_page_components/PostComments'
 
@@ -36,13 +36,13 @@ const PostPage = () => {
     }
 
     const likeHandler = async (action) => {
-        await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/like`, {id:blog._id, userId:currentUser.email, action})
-        .then((res)=>{
-            if(res.data.status == 'done'){
-                 setLiked(!liked)
-                 setLikes(res.data.likes)
+        await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/like`, { id: blog._id, userId: currentUser.email, action })
+            .then((res) => {
+                if (res.data.status == 'done') {
+                    setLiked(!liked)
+                    setLikes(res.data.likes)
                 }
-        })
+            })
 
     }
 
@@ -56,7 +56,14 @@ const PostPage = () => {
         <SafeAreaView className="flex-1 bg-white">
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/* Blog Title */}
-                <Text className="py-4 font-bold text-xl text-gray-800 px-5">{blog?.title}</Text>
+                <View className="flex-row items-center py-4 px-5">
+                    <View className="p-2 rounded-full bg-gray-100 text-orange-500">
+                        <FontAwesome6 name="feather" size={14} color="#f97316" />
+                    </View>
+                    <Text className="font-bold text-xl text-gray-800 ml-2">
+                        {blog?.title}
+                    </Text>
+                </View>
 
                 {/* Blog Image */}
                 <Image
