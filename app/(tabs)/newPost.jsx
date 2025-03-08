@@ -5,12 +5,15 @@ import AddImage from '@/components/new post components/AddImage'
 import AddText from '@/components/new post components/AddText'
 import Entypo from '@expo/vector-icons/Entypo';
 import axios from 'axios'
+import { useUserContext } from '@/hooks/useCurrentUser'
 import { router } from 'expo-router'
 
 
 export default function newPost() {
-  const authorId = 'raja@gmail.com'
-  const username = 'raja'
+  // const authorId = 'raja@gmail.com'
+  // const username = currentUser.'raja'
+  const {currentUser} = useUserContext()
+
   const [active, setActive] = useState('images')
   const [image, setImage] = useState(null)
   const [postData, setPostData] = useState({
@@ -37,8 +40,9 @@ export default function newPost() {
     //   formdata.append(`${element}`,formdata[element])
     // });
 
-    formdata.append('authorId', authorId)
-    formdata.append('username', username)
+    formdata.append('authorId', currentUser.email)
+    // console.log(authorId)
+    formdata.append('username', currentUser.username)
     // console.log('calling', formdata)
     await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/create`, formdata,{
       headers: {
