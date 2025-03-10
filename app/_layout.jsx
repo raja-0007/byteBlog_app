@@ -35,6 +35,7 @@ export default function RootLayout() {
     // <ThemeProvider >
     <UserProvider>
       <SocketProvider>
+        <StatusBar style="dark" />
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
@@ -43,9 +44,9 @@ export default function RootLayout() {
           <Stack.Screen name="authentication/login" options={{ headerShown: false }} />
           <Stack.Screen name="authentication/register" options={{ headerShown: false }} />
           <Stack.Screen name="post_page/[postId]" options={{ title: 'Blog Overview' }} />
+          <Stack.Screen name="profile_page/[profile]" options={{ title: 'Profile Page' }} />
 
         </Stack>
-        <StatusBar style="dark" />
       </SocketProvider>
     </UserProvider>
 

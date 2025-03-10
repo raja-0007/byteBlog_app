@@ -75,9 +75,10 @@ const PostCard = ({ post, scrollEnabled, setScrollEnabled }) => {
     }
     return (
         <View>
-            <View className='p-5 border-y-2 border-gray-300 flex flex-row items-center gap-1 '>
+            <Pressable onPress={()=>router.push(`/profile_page/${post.authorId}`)} className='p-5 border-y-2 border-gray-300 flex flex-row items-center gap-1 '>
                 <FontAwesome name="user-circle" size={20} color="black" />
-                <Text>{post.username}</Text></View>
+                <Text>{post.username}</Text>
+                </Pressable>
             <TouchableOpacity onPress={handleclick} className='h-[400px] w-full relative flex items-center justify-center'>
                 <Image source={{ uri: `${process.env.EXPO_PUBLIC_BASE_URL}/images/${post.image}` }} className='w-full h-full' />
                 {!background && isOverlapTitle && <View className='absolute z-20 bottom-3 right-3'>

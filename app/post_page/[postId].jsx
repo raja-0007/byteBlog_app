@@ -1,6 +1,6 @@
 import { View, Text, SafeAreaView, Image, ScrollView, Pressable } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { useLocalSearchParams } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
 import axios from 'axios'
 import { FontAwesome, FontAwesome5, FontAwesome6 } from '@expo/vector-icons'
 import { useUserContext } from '@/hooks/useCurrentUser';
@@ -83,6 +83,16 @@ const PostPage = () => {
                     <Text className="font-bold text-lg text-gray-900">Content</Text>
                     <Text className="text-gray-600 text-base leading-relaxed">{blog?.content}</Text>
                 </View>
+
+                <Pressable onPress={()=>router.push(`/profile_page/${blog?.authorId}`)} className="flex-row items-center py-4 px-5">
+                    <Text className='font-semibold mr-3'>written by</Text>
+                    <View className="p-2 rounded-full bg-gray-100 text-orange-500">
+                         <FontAwesome6 name="feather" size={14} color="#f97316" />
+                    </View>
+                    <Text className="font-bold text-xl capitalize text-gray-800 ml-1">
+                        {blog?.username}
+                    </Text>
+                </Pressable>
 
                 {/* Like & Comment Section */}
                 <View className="px-5 py-4 flex flex-row items-center justify-between border-t border-gray-300">

@@ -41,7 +41,7 @@ export default function TabLayout() {
           title: 'profile',
           tabBarIcon: ({ color }) => <FontAwesome name="user-circle" size={24} color={color} />,
           // headerShown:false
-          headerTitle:'profile'
+          headerTitle:'profile',
         }}
       />
       

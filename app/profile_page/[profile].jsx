@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, Image, ScrollView, Pressable } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
-import { useUserContext } from '@/hooks/useCurrentUser';
 import axios from 'axios';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 
 const Profile = () => {
-    const { currentUser } = useUserContext();
+    const [ currentUser, setCurrentUser ] = useState(null);
+    const {profile} = useLocalSearchParams()
+
+    console.log('profile[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[',profile)
     const [blogs, setBlogs] = useState([])
     const user = {
         name: 'John Doe',
@@ -22,16 +24,18 @@ const Profile = () => {
     const getPosts=async()=>{
         const res = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/getprofile`,{
             params:{
-                user:currentUser.email
+                user:profile
             }
         
         })
 
-        setBlogs(res.data.blogs)
+        console.log('res[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[',res.data)
+        setCurrentUser(res.data.profile)
+            setBlogs(res.data.blogs)
     }
     useEffect(()=>{
         getPosts()
-    },[currentUser])
+    },[profile])
 
     return (
         <ScrollView className="p-5 bg-gray-50 min-h-full">
@@ -41,8 +45,8 @@ const Profile = () => {
                 {/* <View className="w-28 h-28 rounded-full border-4 border-gray-400"> */}
                     <FontAwesome name="user-circle" size={100} color="gray" />
                     {/* </View> */}
-                <Text className="text-2xl font-bold text-gray-900 mt-3">{currentUser.username}</Text>
-                <Text className="text-gray-600 text-sm">{currentUser.email}</Text>
+                <Text className="text-2xl font-bold text-gray-900 mt-3">{currentUser?.username}</Text>
+                <Text className="text-gray-600 text-sm">{currentUser?.email}</Text>
             </View>
 
             {/* Stats Section */}
@@ -68,7 +72,7 @@ const Profile = () => {
                 <View className="flex-row flex-wrap -m-1">
                     {blogs.map((item) => (
                         <View key={item._id} className="w-1/3 p-[1px]">
-                            <Pressable onPress={()=>router.push(`/post_page/${item._id}`)} className="bg-gray-100  rounded-lg shadow-md flex items-center justify-center h-32">
+                            <Pressable onPress={()=>router.push(`/post_page/${item._id}`)}    className="bg-gray-100  rounded-lg shadow-md flex items-center justify-center h-32">
                                 <Image source={{ uri: `${process.env.EXPO_PUBLIC_BASE_URL}/images/${item.image}` }} className="w-full h-full " />
                             </Pressable>
                         </View>
