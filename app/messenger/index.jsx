@@ -12,6 +12,8 @@ import axios from 'axios'
 import { useUserContext } from '@/hooks/useCurrentUser'
 import Octicons from '@expo/vector-icons/Octicons';
 import { Searchbar } from 'react-native-paper';
+import { useSocketContext } from '@/hooks/headSocket'
+
 
 const index = () => {
     const { currentUser, activeUsers, setActiveUsers } = useUserContext()
@@ -60,6 +62,9 @@ const index = () => {
     ])
     const usersRef = useRef(null)
     const [allUsers, setAllUsers] = useState([])
+
+    const [unread, setUnread] = useState({})
+    const { ws, socketID } = useSocketContext()
     // const [activeUsers, setActiveUsers] = useState([])
 
     const [chats, setChats] = useState([])
@@ -78,6 +83,7 @@ const index = () => {
                 setActiveUsers(res.data.activeUsers)
             }
             getChats()
+            
 
             // document.addEventListener('click', (e)=>{
             //     if(usersRef && usersRef.current && !usersRef.current.contains(e.nativeEvent.target)){
@@ -86,6 +92,28 @@ const index = () => {
             // })
         }, [currentUser])
     )
+
+    useEffect(() => {
+        // getMessages()
+    
+        if (ws) {
+    
+          ws.on('new_message', (data) => {
+            // console.log('Message from server:', data)
+            if (data.status == 'message saved') {
+              console.log('new me', data, [...(unread[data.newMessage.from] || []), data.newMessage.message])
+              setUnread((prev) => ({
+                ...prev,
+                [data.newMessage.from]: [...(prev[data.newMessage.from] || []), data.newMessage.message]
+              }));            }
+            else if(!data.status){
+              console.log('new message', data)
+            }
+          });
+        }
+      }, []);
+
+      console.log('unread unread unread', unread)
     // useEffect(() => {
     //     const getChats = async () => {
     //         console.log('currentuserrrrrrrrrrrrrrrrrrrrrrrrr', currentUser)
@@ -176,11 +204,29 @@ const index = () => {
                                 </View>
                                 <View >
                                     <Text className='font-medium capitalize'>{item.participants.filter(x => x !== currentUser.username)[0]}</Text>
-                                    <Text className='text-gray-500'>{item.lastMessage.message}</Text>
-                                </View>
+                                    {Object.keys(unread).length === 0 || unread[item.participants.filter(x => x !== currentUser.username)[0]]?.length === 0 
+  ? <Text className='text-gray-500'>{item.lastMessage.message}</Text> 
+  : <Text className='text-orange-500'>
+      {unread[item.participants.filter(x => x !== currentUser.username)[0]]?.[unread[item.participants.filter(x => x !== currentUser.username)[0]]?.length - 1]} 
+      {/* {unread[item.participants.filter(x => x !== currentUser.username)[0]]?.length} */}
+    </Text>
+}
+</View>
 
                             </View>
-                            <View><Text className='text-gray-500'>11:30</Text></View>
+                            <View>
+                                {Object.keys(unread).length !== 0 && unread[item.participants.filter(x => x !== currentUser.username)[0]]?.length !== 0 ?
+                                <View className="flex-row items-center">
+                                <View className="mr-2 p-1 rounded-full bg-orange-400">
+                                  <Text className="text-orange-500">{unread[item.participants.filter(x => x !== currentUser.username)[0]]?.length}</Text>
+                                </View>
+                                <Text className="text-gray-500">11:30</Text>
+                              </View>
+                                :
+                                <Text className='text-gray-500'>11:30</Text>
+                                }
+                                
+                            </View>
 
 
                         </Pressable>
