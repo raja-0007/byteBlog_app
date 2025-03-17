@@ -64,7 +64,7 @@ const index = () => {
   const [allUsers, setAllUsers] = useState([])
 
   const [unread, setUnread] = useState({})
-  const { ws, socketID } = useSocketContext()
+  const { ws, socketID, connectSocket } = useSocketContext()
   // const [activeUsers, setActiveUsers] = useState([])
 
   const [chats, setChats] = useState([])
@@ -72,16 +72,17 @@ const index = () => {
   useFocusEffect(
     useCallback(() => {
       const getChats = async () => {
-        console.log('currentuserrrrrrrrrrrrrrrrrrrrrrrrr', currentUser)
+        console.log('currentuserrrrrrrrrrrrrrrrrrrrrrrrr in get chats', currentUser)
         const res = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/getChats`, {
           params: { username: currentUser.username }
         })
-        // console.log('res for chatlists', res.data)
+        console.log('res for chatlists', res.data)
         setChats(res.data.chatList)
         setAllUsers(res.data.allUsers)
 
         setActiveUsers(res.data.activeUsers)
       }
+      console.log('getting chats')
       getChats()
 
 
@@ -112,9 +113,12 @@ const index = () => {
         }
       });
     }
+    else{
+      connectSocket(currentUser)
+    }
   }, []);
 
-  console.log('unread unread unread', unread)
+  // console.log('unread unread unread', unread)
   // useEffect(() => {
   //     const getChats = async () => {
   //         console.log('currentuserrrrrrrrrrrrrrrrrrrrrrrrr', currentUser)

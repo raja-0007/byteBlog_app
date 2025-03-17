@@ -12,7 +12,7 @@ import { useSocketContext } from '@/hooks/headSocket'
 
 const chatPage = () => {
   const { currentUser, activeUsers } = useUserContext()
-  const { ws, socketID, roomId } = useSocketContext()
+  const { ws, socketID, roomId, connectSocket } = useSocketContext()
   const { chatPage } = useLocalSearchParams()
   const [isSocketDisconnected, setIsSocketDisconnected] = useState(true)
   const [messages, setMessages] = useState([])
@@ -130,6 +130,9 @@ const chatPage = () => {
         }
       });
     }
+    else{
+      connectSocket(currentUser)
+    }
 
     return () => {
       ws.emit('leaveChat', { roomId })
@@ -147,8 +150,8 @@ const chatPage = () => {
     // if (ws) {
     // ws.emit('message', 'Hello from the client!');
     // ws.emit('message', { from: currentUser, to: chatPage, message: value, socketId: socketID });
-    // console.log('sending message', currentUser.username, chatPage, roomId, value, socketID)
-    await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/newMessage`, { from: currentUser.username, to: chatPage, roomId: roomId, message: value, socketId: socketID })
+    console.log('sending message', currentUser.username, chatPage, roomId, value, socketID)
+    await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/newMessage`, { from: currentUser.username, to: chatPage, roomId: roomId, message: value})
       .then(res => console.log('message sent'))
     // }
   };

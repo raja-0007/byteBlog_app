@@ -12,7 +12,7 @@ export const SocketProvider = ({ children }) => {
         if (!ws) {
             const socket = io(process.env.EXPO_PUBLIC_BASE_URL, {
                 transports: ['websocket'],
-                forceNew: true,
+                // forceNew: true,
                 reconnectionAttempts: 5,
                 timeout: 10000,
                 query:{
