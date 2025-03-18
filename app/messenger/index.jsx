@@ -16,7 +16,7 @@ import { useSocketContext } from '@/hooks/headSocket'
 
 
 const index = () => {
-  const { currentUser, activeUsers, setActiveUsers } = useUserContext()
+  const { currentUser, activeUsers, setActiveUsers, unread, setUnread } = useUserContext()
   const [searchQuery, setSearchQuery] = useState('')
   const [friendsList, setFriendsList] = useState([
     {
@@ -63,7 +63,7 @@ const index = () => {
   const usersRef = useRef(null)
   const [allUsers, setAllUsers] = useState([])
 
-  const [unread, setUnread] = useState({})
+  // const [unread, setUnread] = useState({})
   const { ws, socketID, connectSocket } = useSocketContext()
   // const [activeUsers, setActiveUsers] = useState([])
 
@@ -102,7 +102,7 @@ const index = () => {
       ws.on('new_message', (data) => {
         // console.log('Message from server:', data)
         if (data.status == 'message saved') {
-          console.log('new me', data, [...(unread[data.newMessage.from] || []), data.newMessage.message])
+          // console.log('new me', data, [...(unread[data.newMessage.from] || []), data.newMessage.message])
           setUnread((prev) => ({
             ...prev,
             [data.newMessage.from]: [...(prev[data.newMessage.from] || []), data.newMessage.message]
@@ -196,6 +196,7 @@ const index = () => {
         <MaterialCommunityIcons name="sort-reverse-variant" size={14} color="black" /></View>
       <ScrollView>
         {chats.map((item, i) => {
+          console.log('for each user >>>>>>>>>>>>>>... ', unread[item.participants.filter(x => x !== currentUser.username)[0]] )
           return (
             <Pressable onPress={() => {
               router.push(`/messenger/${item.participants.filter(x => x !== currentUser.username)[0]}`)
@@ -210,7 +211,7 @@ const index = () => {
                 </View>
                 <View >
                   <Text className='font-medium capitalize'>{item.participants.filter(x => x !== currentUser.username)[0]}</Text>
-                  {Object.keys(unread).length === 0 || unread[item.participants.filter(x => x !== currentUser.username)[0]]?.length === 0
+                  {!unread[item.participants.filter(x => x !== currentUser.username)[0]] || unread[item.participants.filter(x => x !== currentUser.username)[0]]?.length === 0
                     ? <Text className='text-gray-500'>{item.lastMessage.message}</Text>
                     : <Text className='text-orange-500'>
                       {unread[item.participants.filter(x => x !== currentUser.username)[0]]?.[unread[item.participants.filter(x => x !== currentUser.username)[0]]?.length - 1]}
@@ -221,7 +222,7 @@ const index = () => {
 
               </View>
               <View>
-                {Object.keys(unread).length !== 0 && unread[item.participants.filter(x => x !== currentUser.username)[0]]?.length !== 0 ?
+                {unread[item.participants.filter(x => x !== currentUser.username)[0]] && unread[item.participants.filter(x => x !== currentUser.username)[0]]?.length !== 0 ?
                   <View className="flex-row items-center">
                     <View className="mr-2 p-1 flex-row items-center justify-center w-5 h-5 rounded-full bg-orange-400">
                       <Text className="text-white">{unread[item.participants.filter(x => x !== currentUser.username)[0]]?.length}</Text>

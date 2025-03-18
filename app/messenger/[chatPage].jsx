@@ -1,5 +1,5 @@
 import { View, Text, ScrollView } from 'react-native'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useLocalSearchParams } from 'expo-router'
 import SafeAreaWrapper from '@/components/Layout wrappers/SafeAreaWrapper'
 import ChatHeader from '@/components/messenger components/ChatHeader'
@@ -11,7 +11,7 @@ import { useUserContext } from '@/hooks/useCurrentUser'
 import { useSocketContext } from '@/hooks/headSocket'
 
 const chatPage = () => {
-  const { currentUser, activeUsers } = useUserContext()
+  const { currentUser, activeUsers, setUnread, unread } = useUserContext()
   const { ws, socketID, roomId, connectSocket } = useSocketContext()
   const { chatPage } = useLocalSearchParams()
   const [isSocketDisconnected, setIsSocketDisconnected] = useState(true)
@@ -19,6 +19,9 @@ const chatPage = () => {
 
   const getMessages = async () => {
     console.log('getting messages')
+    let unreadmessages = {...unread}
+    delete unreadmessages[chatPage]
+    setUnread(unreadmessages)
     // setMessages([
     //   {
     //     "from": "raja",
@@ -114,30 +117,31 @@ const chatPage = () => {
       // setMessages(res.data)
     })
   }
-  useEffect(() => {
-    // getMessages()
+  const wsRef = useRef(null);
 
-    if (ws) {
-      ws.emit('joinChat', { user1Id: currentUser.username, user2Id: chatPage })
+  useEffect(() => {
+    if (!ws) {
+      connectSocket();
+    } else {
+      wsRef.current = ws; // Store the latest socket reference
+
+      ws.emit('joinChat', { user1Id: currentUser.username, user2Id: chatPage });
 
       ws.on('message', (data) => {
-        // console.log('Message from server:', data)
-        if (data.status == 'message saved') {
-          setMessages(data.newMessages)
-        }
-        else if(!data.status){
-          setMessages(data.messages)
+        if (data.status === 'message saved') {
+          setMessages(data.newMessages);
+        } else if (!data.status) {
+          setMessages(data.messages);
         }
       });
     }
-    else{
-      connectSocket(currentUser)
-    }
 
     return () => {
-      ws.emit('leaveChat', { roomId })
-    }
-  }, []);
+      if (wsRef.current) {
+        wsRef.current.emit('leaveChat', { roomId });  // Use the ref for consistent cleanup
+      }
+    };
+  }, [ws, roomId, connectSocket])
 
   useEffect(()=>{
     if(roomId && messages.length===0){
