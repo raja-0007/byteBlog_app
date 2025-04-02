@@ -121,7 +121,8 @@ const chatPage = () => {
 
   useEffect(() => {
     if (!ws) {
-      connectSocket();
+      // connectSocket();
+      console.log('socket not connected')
     } else {
       wsRef.current = ws; // Store the latest socket reference
 
@@ -154,10 +155,26 @@ const chatPage = () => {
     // if (ws) {
     // ws.emit('message', 'Hello from the client!');
     // ws.emit('message', { from: currentUser, to: chatPage, message: value, socketId: socketID });
-    console.log('sending message', currentUser.username, chatPage, roomId, value, socketID)
-    await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/newMessage`, { from: currentUser.username, to: chatPage, roomId: roomId, message: value})
-      .then(res => console.log('message sent'))
-    // }
+    // console.log('sending message', currentUser.username, chatPage, roomId, value, socketID)
+    // await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/newMessage`, { from: currentUser.username, to: chatPage, roomId: roomId, message: value})
+    //   .then(res => console.log('message sent'))
+    // // }
+
+    if (!ws) return;
+
+    console.log('Sending message:', currentUser.username, chatPage, roomId, value, socketID);
+
+    ws.emit('sendMessage', { 
+        from: currentUser.username, 
+        to: chatPage, 
+        roomId, 
+        message: value 
+    }, (response) => {  // Acknowledgment from server
+        console.log('Message Acknowledgment:', response);
+        // if (response.status === 'success') {
+        //     setMessages((prev) => [...prev, { from: currentUser.username, message: value }]);
+        // }
+    });
   };
 
   // console.log('active user testtttttttttttt>>>>>>>>>>>>>>>.',activeUsers, chatPage, activeUsers.some(x => x.username !== chatPage) )

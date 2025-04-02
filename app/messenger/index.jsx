@@ -68,30 +68,36 @@ const index = () => {
   // const [activeUsers, setActiveUsers] = useState([])
 
   const [chats, setChats] = useState([])
+  const getChats = async () => {
+    console.log('currentuserrrrrrrrrrrrrrrrrrrrrrrrr in get chats', currentUser)
+    const res = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/getChats`, {
+      params: { username: currentUser.username }
+    })
+    console.log('res for chatlists', res.data)
+    setChats(res.data.chatList)
+    setAllUsers(res.data.allUsers)
+
+    setActiveUsers(res.data.activeUsers)
+  }
 
   useFocusEffect(
+    // useCallback(() => {
     useCallback(() => {
-      const getChats = async () => {
-        console.log('currentuserrrrrrrrrrrrrrrrrrrrrrrrr in get chats', currentUser)
-        const res = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/getChats`, {
-          params: { username: currentUser.username }
-        })
-        console.log('res for chatlists', res.data)
-        setChats(res.data.chatList)
-        setAllUsers(res.data.allUsers)
+      console.log('Fetching chats...');
+      getChats();
 
-        setActiveUsers(res.data.activeUsers)
-      }
-      console.log('getting chats')
-      getChats()
+      return () => {
+        console.log('Cleanup on screen blur');
+      };
+    }, [])
 
 
-      // document.addEventListener('click', (e)=>{
-      //     if(usersRef && usersRef.current && !usersRef.current.contains(e.nativeEvent.target)){
-      //         console.log('clicked outside')
-      //     }
-      // })
-    }, [currentUser])
+    // document.addEventListener('click', (e)=>{
+    //     if(usersRef && usersRef.current && !usersRef.current.contains(e.nativeEvent.target)){
+    //         console.log('clicked outside')
+    //     }
+    // })
+    // }, [])
   )
 
   useEffect(() => {
@@ -100,22 +106,29 @@ const index = () => {
     if (ws) {
 
       ws.on('new_message', (data) => {
-        // console.log('Message from server:', data)
-        if (data.status == 'message saved') {
-          // console.log('new me', data, [...(unread[data.newMessage.from] || []), data.newMessage.message])
-          setUnread((prev) => ({
-            ...prev,
-            [data.newMessage.from]: [...(prev[data.newMessage.from] || []), data.newMessage.message]
-          }));
-        }
-        else if (!data.status) {
-          console.log('new message', data)
-        }
+        console.log('Message from server:', data)
+        // if (data.status == 'message saved') {
+        //   // console.log('new me', data, [...(unread[data.newMessage.from] || []), data.newMessage.message])
+        //   setUnread((prev) => ({
+        //     ...prev,
+        //     [data.newMessage.from]: [...(prev[data.newMessage.from] || []), data.newMessage.message]
+        //   }));
+        // }
+        // else if (!data.status) {
+        //   console.log('new message', data)
+        // }
       });
     }
-    else{
-      connectSocket(currentUser)
+    else {
+      // connectSocket();
+      console.log('socket not connected')
     }
+
+    return () => {
+      if (ws) {
+        ws.off('new_message'); // Cleanup event listener
+      }
+    };
   }, []);
 
   // console.log('unread unread unread', unread)
@@ -196,7 +209,7 @@ const index = () => {
         <MaterialCommunityIcons name="sort-reverse-variant" size={14} color="black" /></View>
       <ScrollView>
         {chats.map((item, i) => {
-          console.log('for each user >>>>>>>>>>>>>>... ', unread[item.participants.filter(x => x !== currentUser.username)[0]] )
+          console.log('for each user >>>>>>>>>>>>>>... ', unread[item.participants.filter(x => x !== currentUser.username)[0]])
           return (
             <Pressable onPress={() => {
               router.push(`/messenger/${item.participants.filter(x => x !== currentUser.username)[0]}`)

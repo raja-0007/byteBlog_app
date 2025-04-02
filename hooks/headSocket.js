@@ -1,9 +1,13 @@
 import React, { createContext, useContext, useState } from 'react';
 import io from 'socket.io-client'; // Import socket.io-client
+import { useUserContext } from './useCurrentUser';
 
 const SocketContext = createContext();
 
+
+
 export const SocketProvider = ({ children }) => {
+    const { setUnread } = useUserContext()
     const [ws, setWs] = useState(null);
     const [socketID, setSocketID] = useState(null)
     const [roomId, setRoomId] = useState(null)
@@ -30,6 +34,20 @@ export const SocketProvider = ({ children }) => {
                 setSocketID(socketId);
                 // You can now store this socketId on the client
             });
+
+            socket.on('new_message', (data) => {
+                console.log('Message from server:', data)
+                if (data.status == 'message saved') {
+                  // console.log('new me', data, [...(unread[data.newMessage.from] || []), data.newMessage.message])
+                  setUnread((prev) => ({
+                    ...prev,
+                    [data.newMessage.from]: [...(prev[data.newMessage.from] || []), data.newMessage.message]
+                  }));
+                }
+                else if (!data.status) {
+                  console.log('new message', data)
+                }
+              });
             socket.on('disconnect', () => console.log('Disconnected from server'));
             
             socket.on('joinedChat', (data) => {

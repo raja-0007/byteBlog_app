@@ -19,22 +19,30 @@ const HeaderDiv = () => {
     if (ws) {
 
       ws.on('new_message', (data) => {
-        // console.log('Message from server:', data)
-        if (data.status == 'message saved') {
-          // console.log('new me', data, [...(unread[data.newMessage.from] || []), data.newMessage.message])
-          setUnread((prev) => ({
-            ...prev,
-            [data.newMessage.from]: [...(prev[data.newMessage.from] || []), data.newMessage.message]
-          }));
-        }
-        else if (!data.status) {
-          console.log('new message', data)
-        }
+        console.log('Message from server:', data)
+        // if (data.status == 'message saved') {
+        //   // console.log('new me', data, [...(unread[data.newMessage.from] || []), data.newMessage.message])
+        //   setUnread((prev) => ({
+        //     ...prev,
+        //     [data.newMessage.from]: [...(prev[data.newMessage.from] || []), data.newMessage.message]
+        //   }));
+        // }
+        // else if (!data.status) {
+        //   console.log('new message', data)
+        // }
       });
     }
     else{
-      connectSocket(currentUser)
+      // connectSocket(currentUser)
+      console.log('socker not connected')
     }
+
+
+    return () => {
+      if (ws) {
+        ws.off('new_message'); // Cleanup event listener
+      }
+    };
   }, []);
 
 
