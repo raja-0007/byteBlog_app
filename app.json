@@ -15,7 +15,11 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.rajagoud.byteBlogApp"
     },
     "web": {
       "bundler": "metro",
@@ -38,11 +42,18 @@
         {
           "photosPermission": "Allow $(PRODUCT_NAME) to access your photos"
         }
-
       ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "760dadc2-1bf9-4343-a992-7896c76b9f9b"
+      }
     }
   }
 }
