@@ -17,7 +17,7 @@
         "gradleCommand": ":app:assembleRelease" 
       },
       "env": {
-        "EXPO_PUBLIC_BASE_URL":"https://byteblog-app-server-production.up.railway.app"
+        "EXPO_PUBLIC_BASE_URL":"https://byteblog-app-server.onrender.com"
       }
     }
   },
