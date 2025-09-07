@@ -18,7 +18,7 @@ const ChatFooter = ({sendMessage}) => {
   }
   return (
     <View className='px-8  h-[9vh] flex flex-row items-center justify-center gap-2'>
-        <TextInput multiline returnKeyType='send'
+        <TextInput returnKeyType='send'
         // value={comment} onChangeText={setComment}
          placeholder={`message`} value={message} onChange={changehandler} className='border rounded-full px-5 border-gray-300 w-[90%] h-12' />
          <View className='h-12 w-12 rounded-full bg-orange-300 flex items-center justify-center'>
