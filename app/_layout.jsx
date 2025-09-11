@@ -10,6 +10,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import '../global.css';
 import { UserProvider } from '@/hooks/useCurrentUser'
 import { SocketProvider } from '@/hooks/headSocket'
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -34,6 +35,7 @@ export default function RootLayout() {
   return (
     // <ThemeProvider >
     <UserProvider>
+      <GestureHandlerRootView className="flex-1">
       <SocketProvider>
         <StatusBar style="dark" />
         <Stack
@@ -80,14 +82,15 @@ export default function RootLayout() {
          />
           <Stack.Screen name="messenger/[chatPage]" options={{ headerShown: false }} />
           <Stack.Screen name="authentication/login" options={{ headerShown: false }} />
+          <Stack.Screen name="animatedPage" options={{ headerShown: false }} />
           <Stack.Screen name="authentication/register" options={{ headerShown: false }} />
           <Stack.Screen name="post_page/[postId]" options={{ title: 'Blog Overview' }} />
           <Stack.Screen name="profile_page/[profile]" options={{ title: 'Profile Page' }} />
 
         </Stack>
       </SocketProvider>
+    </GestureHandlerRootView>
     </UserProvider>
-
     // </ThemeProvider>
   );
 }
