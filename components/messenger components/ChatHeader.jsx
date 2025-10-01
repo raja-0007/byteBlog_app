@@ -8,7 +8,7 @@ import Octicons from '@expo/vector-icons/Octicons';
 
 const ChatHeader = ({ title, type, active, sendMessage }) => {
     return (
-        <View className={`px-5 ${type == 'chat' ? 'h-[7vh]' : 'py-4'} flex flex-row items-center gap-3 border-b-2 border-gray-300`} >
+        <View className={`px-5 ${type == 'chat' ? 'h-[7vh]' : 'py-4'} flex flex-row items-center gap-3 bg-white `} >
             {type == 'messenger' ? <FontAwesome6 onPress={() => router.back()} name="facebook-messenger" size={24} color="black" />
                 : 
                 <View className='relative'>

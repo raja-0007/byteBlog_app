@@ -1,69 +1,66 @@
+// HeaderDiv.jsx
 import React, { useEffect } from 'react'
-import { Text, View } from 'react-native'
+import { Text, View, TouchableOpacity } from 'react-native'
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-import AntDesign from '@expo/vector-icons/AntDesign';
 import { router } from 'expo-router';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { useUserContext } from '@/hooks/useCurrentUser';
 import { useSocketContext } from '@/hooks/headSocket';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const HeaderDiv = () => {
+    const { currentUser, activeUsers, setActiveUsers, unread, setUnread } = useUserContext()
+    const { ws, socketID, connectSocket } = useSocketContext()
 
-  const { currentUser, activeUsers, setActiveUsers, unread, setUnread  } = useUserContext()
-  const { ws, socketID, connectSocket } = useSocketContext()
+    useEffect(() => {
+        if (ws) {
+            ws.on('new_message', (data) => {
+                console.log('Message from server:', data)
+            });
+        } else {
+            console.log('socket not connected')
+        }
 
+        return () => {
+            if (ws) {
+                ws.off('new_message');
+            }
+        };
+    }, []);
 
-  useEffect(() => {
-    // getMessages()
-
-    if (ws) {
-
-      ws.on('new_message', (data) => {
-        console.log('Message from server:', data)
-        // if (data.status == 'message saved') {
-        //   // console.log('new me', data, [...(unread[data.newMessage.from] || []), data.newMessage.message])
-        //   setUnread((prev) => ({
-        //     ...prev,
-        //     [data.newMessage.from]: [...(prev[data.newMessage.from] || []), data.newMessage.message]
-        //   }));
-        // }
-        // else if (!data.status) {
-        //   console.log('new message', data)
-        // }
-      });
-    }
-    else{
-      // connectSocket(currentUser)
-      console.log('socker not connected')
-    }
-
-
-    return () => {
-      if (ws) {
-        ws.off('new_message'); // Cleanup event listener
-      }
-    };
-  }, []);
-
-
-  return (
-    <View className='bg-gray-200 p-5 flex flex-row items-center justify-between'>
-      <View className='flex flex-row items-center'>
-        <FontAwesome5 name="feather" size={24} color="black" />
-        <Text className='text-xl'>ByteBlog</Text>
-      </View>
-      <View className='relative'>
-        {Object.keys(unread).length !== 0 && <View className="mr-2 p-1 absolute top-[-10] right-[-10] z-50 flex-row items-center justify-center w-5 h-5 rounded-full bg-orange-400">
-          <Text className="text-white">{Object.keys(unread)?.length}</Text>
-        </View>}
-
-        <FontAwesome6 onPress={() => router.push('/messenger')} name="facebook-messenger" size={24} color="black" />
-      </View>
-
-      {/* <AntDesign name="wechat" size={24} color="black" /> */}
-
-    </View>
-  )
+    return (
+        <View className='bg-white shadow-sm'>
+            <LinearGradient
+                colors={['#ffffff', '#ffffff']}
+                // colors={['#ffffff', '#fff7ed']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                className='px-6 py-4 flex flex-row items-center justify-between'
+            >
+                <View className='flex flex-row items-center gap-2'>
+                    <View className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+                        <FontAwesome5 name="feather" size={20} color="#fb923c" />
+                    </View>
+                    <Text className='text-2xl font-bold text-gray-800'>ByteBlog</Text>
+                </View>
+                
+                <TouchableOpacity 
+                    onPress={() => router.push('/messenger')}
+                    className='relative'
+                    activeOpacity={0.7}
+                >
+                    {Object.keys(unread).length !== 0 && (
+                        <View className="absolute top-[-8px] right-[-8px] z-50 flex items-center justify-center min-w-[20px] h-5 rounded-full bg-orange-500 px-1 shadow-md">
+                            <Text className="text-white text-xs font-bold">{Object.keys(unread)?.length}</Text>
+                        </View>
+                    )}
+                    <View className="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center">
+                        <FontAwesome6 name="facebook-messenger" size={20} color="#fb923c" />
+                    </View>
+                </TouchableOpacity>
+            </LinearGradient>
+        </View>
+    )
 }
 
 export default HeaderDiv

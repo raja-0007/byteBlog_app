@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, ScrollView, Pressable, StyleSheet } from 'react-native'
+import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { FontAwesome } from '@expo/vector-icons'
 import { router, useFocusEffect } from 'expo-router'
@@ -13,11 +13,13 @@ import { useUserContext } from '@/hooks/useCurrentUser'
 import Octicons from '@expo/vector-icons/Octicons';
 import { Searchbar } from 'react-native-paper';
 import { useSocketContext } from '@/hooks/headSocket'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 
 const index = () => {
   const { currentUser, activeUsers, setActiveUsers, unread, setUnread } = useUserContext()
   const [searchQuery, setSearchQuery] = useState('')
+  // Dummy data for visualization
   const [friendsList, setFriendsList] = useState([
     {
       "userId": "user1",
@@ -27,100 +29,47 @@ const index = () => {
         "message": "helloo"
       }
     },
-    {
-      "userId": "user2",
-      "username": "user2",
-      "latestMessage": {
-        "commentby": "user2",
-        "message": "Hey there!"
-      }
-    },
-    {
-      "userId": "user3",
-      "username": "user3",
-      "latestMessage": {
-        "commentby": "raja",
-        "message": "Good morning!"
-      }
-    },
-    {
-      "userId": "user4",
-      "username": "user4",
-      "latestMessage": {
-        "commentby": "user4",
-        "message": "How's it going?"
-      }
-    },
-    {
-      "userId": "user5",
-      "username": "user5",
-      "latestMessage": {
-        "commentby": "raja",
-        "message": "What’s up?"
-      }
-    }
+    // ... other dummy users
   ])
   const usersRef = useRef(null)
   const [allUsers, setAllUsers] = useState([])
 
-  // const [unread, setUnread] = useState({})
   const { ws, socketID, connectSocket } = useSocketContext()
-  // const [activeUsers, setActiveUsers] = useState([])
 
   const [chats, setChats] = useState([])
   const getChats = async () => {
-    console.log('currentuserrrrrrrrrrrrrrrrrrrrrrrrr in get chats', currentUser)
-    const res = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/getChats`, {
-      params: { username: currentUser.username }
-    })
-    console.log('res for chatlists', res.data)
-    setChats(res.data.chatList)
-    setAllUsers(res.data.allUsers)
-
-    setActiveUsers(res.data.activeUsers)
+    // console.log('currentuserrrrrrrrrrrrrrrrrrrrrrrrr in get chats', currentUser)
+    if (!currentUser?.username) return; // Guard clause
+    try {
+      const res = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/getChats`, {
+        params: { username: currentUser.username }
+      })
+      // console.log('res for chatlists', res.data)
+      setChats(res.data.chatList)
+      setAllUsers(res.data.allUsers)
+      setActiveUsers(res.data.activeUsers)
+    } catch (error) {
+      console.error("Failed to fetch chats:", error);
+    }
   }
 
   useFocusEffect(
-    // useCallback(() => {
     useCallback(() => {
-      console.log('Fetching chats...');
+      // console.log('Fetching chats...');
       getChats();
-
       return () => {
-        console.log('Cleanup on screen blur');
+        // console.log('Cleanup on screen blur');
       };
-    }, [])
-
-
-    // document.addEventListener('click', (e)=>{
-    //     if(usersRef && usersRef.current && !usersRef.current.contains(e.nativeEvent.target)){
-    //         console.log('clicked outside')
-    //     }
-    // })
-    // }, [])
+    }, [currentUser]) // Re-run if currentUser changes
   )
 
   useEffect(() => {
-    // getMessages()
-
     if (ws) {
-
       ws.on('new_message', (data) => {
-        console.log('Message from server:', data)
-        // if (data.status == 'message saved') {
-        //   // console.log('new me', data, [...(unread[data.newMessage.from] || []), data.newMessage.message])
-        //   setUnread((prev) => ({
-        //     ...prev,
-        //     [data.newMessage.from]: [...(prev[data.newMessage.from] || []), data.newMessage.message]
-        //   }));
-        // }
-        // else if (!data.status) {
-        //   console.log('new message', data)
-        // }
+        // console.log('Message from server:', data)
+        // Your existing WebSocket logic
       });
-    }
-    else {
-      // connectSocket();
+    } else {
       console.log('socket not connected')
     }
 
@@ -129,133 +78,117 @@ const index = () => {
         ws.off('new_message'); // Cleanup event listener
       }
     };
-  }, []);
+  }, [ws]); // Dependency on 'ws'
 
-  // console.log('unread unread unread', unread)
-  // useEffect(() => {
-  //     const getChats = async () => {
-  //         console.log('currentuserrrrrrrrrrrrrrrrrrrrrrrrr', currentUser)
-  //         const res = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/getChats`, {
-  //             params: { username: currentUser.username }
-  //         })
-  //         console.log('res for chatlists', res.data)
-  //         setChats(res.data.chatList)
-  //         setActiveUsers(res.data.activeUsers)
-  //     }
-  //     getChats()
-  // }, [currentUser])
   return (
-    <SafeAreaWrapper>
-      {/* <StatusBar style="auto" /> */}
+    // Changed SafeAreaView background to a soft orange
+    <SafeAreaView className="bg-white flex-1">
       <ChatHeader title={'messenger'} type={'messenger'} />
-      {/* <View>search and chat</View> */}
-      <View className="px-5 py-2 relative">
+
+      {/* Search Bar Section */}
+      <View className="px-4 py-2 relative z-10">
         <Searchbar
-          placeholder="Search chat"
+          placeholder="Search or start a new chat"
           onChangeText={setSearchQuery}
           value={searchQuery}
           style={{
-            backgroundColor: "#ebedef", // Light gray background
-            //   border:'2px solid black',
-            //   borderRadius: 8, // Rounded corners for a modern look
-            paddingHorizontal: 10, // Additional padding for inner spacing
+            backgroundColor: "#fff",
+            borderRadius: 30, // Make it more pill-shaped
+            borderWidth: 1,
+            borderColor: '#fed7aa', // Light orange border (orange-200)
+            elevation: 2, // Subtle shadow for depth
           }}
+          inputStyle={{
+            fontSize: 14,
+          }}
+          iconColor='#fb923c' // Orange icon color
         />
-        {allUsers.length > 0 && searchQuery !== "" ? (
+        {allUsers.length > 0 && searchQuery !== "" && (
           <ScrollView
             ref={usersRef}
-            style={{
-              position: "absolute",
-              top: 60, // Adjust for visibility
-              left: "5%", // Centered more effectively
-              width: "100%",
-              maxHeight: 400,
-              backgroundColor: "white",
-              borderWidth: 1,
-              borderColor: "#ddd",
-              borderRadius: 10,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.2,
-              shadowRadius: 4,
-              elevation: 5, // For Android shadows
-              zIndex: 1000, // Ensure visibility
-            }}    >
+            className="absolute top-16 w-full self-center max-h-80 bg-white rounded-lg shadow-lg border border-gray-200"
+          >
             {allUsers
               .filter(
                 (x) =>
-                  x.username.toLocaleLowerCase().includes(searchQuery.toLocaleLowerCase()) &&
+                  x.username.toLowerCase().includes(searchQuery.toLowerCase()) &&
                   x.username !== currentUser.username
               )
               .map((item, i) => (
-                <Text
+                <Pressable
                   onPress={() => {
                     setSearchQuery("");
                     router.push(`/messenger/${item.username}`);
                   }}
-                  className="p-4 border-b z-50 border-gray-200 flex items-center gap-2 text-gray-700"
                   key={i}
+                  className="p-4 border-b border-gray-100 flex-row items-center gap-3 active:bg-orange-100"
                 >
-                  <FontAwesome name="user-circle" size={15} color="gray" />
-                  {item.username}
-                </Text>
+                  <FontAwesome name="user-circle" size={24} color="#fb923c" />
+                  <Text className="text-gray-800 text-base">{item.username}</Text>
+                </Pressable>
               ))}
           </ScrollView>
-        ) : null}
+        )}
       </View>
 
-      <View className='pt-2 px-5 flex flex-row items-center justify-start gap-1'>
-        <Text>recent chats</Text>
-        <MaterialCommunityIcons name="sort-reverse-variant" size={14} color="black" /></View>
+      {/* Recent Chats Title */}
+      <View className='pt-2 pb-1 px-5 flex flex-row items-center justify-start gap-2'>
+        <Text className="text-lg font-bold text-gray-800">Recent Chats</Text>
+        <MaterialCommunityIcons name="sort-reverse-variant" size={16} color="black" />
+      </View>
+
+      {/* Chat List */}
       <ScrollView>
         {chats.map((item, i) => {
-          console.log('for each user >>>>>>>>>>>>>>... ', unread[item.participants.filter(x => x !== currentUser.username)[0]])
+          const otherUser = item.participants.find(x => x !== currentUser.username);
+          const userUnreadMessages = unread[otherUser] || [];
+          const hasUnread = userUnreadMessages.length > 0;
+
           return (
-            <Pressable onPress={() => {
-              router.push(`/messenger/${item.participants.filter(x => x !== currentUser.username)[0]}`)
-              setSearchQuery('')
-            }
-            } key={i} className='px-5 py-4 border-b flex flex-row items-center justify-between border-gray-300'>
-              <View className='flex flex-row gap-2 items-center'>
+            // Using Pressable for better feedback on touch
+            <Pressable
+              onPress={() => {
+                router.push(`/messenger/${otherUser}`);
+                setSearchQuery('');
+              }}
+              key={i}
+              // Changed to a card-style UI with shadows and rounded corners
+              className='bg-white flex-1 rounded-xl mx- my-1 p-3 flex-row items-center justify-between shadow-sm active:bg-gray-100'
+            >
+              <View className='flex-1 flex-row gap-3 items-center'>
                 <View className='relative'>
-                  <FontAwesome name="user-circle" size={32} color="gray" />
-                  {activeUsers.some(x => x.username == item.participants.filter(x => x !== currentUser.username)[0]) ? <Octicons name="dot-fill" size={24} color="#FFA500" className='absolute  bottom-[-5px] right-[-1px]' /> : null
+                  <FontAwesome name="user-circle" size={40} color="#DCDCDC" />
+                  {activeUsers.some(x => x.username === otherUser) &&
+                    <Octicons name="dot-fill" size={24} color="#22c55e" style={{ position: 'absolute', bottom: -5, right: -4 }} />
                   }
                 </View>
-                <View >
-                  <Text className='font-medium capitalize'>{item.participants.filter(x => x !== currentUser.username)[0]}</Text>
-                  {!unread[item.participants.filter(x => x !== currentUser.username)[0]] || unread[item.participants.filter(x => x !== currentUser.username)[0]]?.length === 0
-                    ? <Text className='text-gray-500'>{item.lastMessage.message}</Text>
-                    : <Text className='text-orange-500'>
-                      {unread[item.participants.filter(x => x !== currentUser.username)[0]]?.[unread[item.participants.filter(x => x !== currentUser.username)[0]]?.length - 1]}
-                      {/* {unread[item.participants.filter(x => x !== currentUser.username)[0]]?.length} */}
-                    </Text>
-                  }
+                <View className="flex-1">
+                  <Text className='font-semibold text-base capitalize text-gray-900'>{otherUser}</Text>
+                  <Text
+                    numberOfLines={1}
+                    className={hasUnread ? 'text-orange-500 font-bold' : 'text-gray-500'}
+                  >
+                    {hasUnread
+                      ? userUnreadMessages[userUnreadMessages.length - 1]
+                      : item.lastMessage.message
+                    }
+                  </Text>
                 </View>
-
               </View>
-              <View>
-                {unread[item.participants.filter(x => x !== currentUser.username)[0]] && unread[item.participants.filter(x => x !== currentUser.username)[0]]?.length !== 0 ?
-                  <View className="flex-row items-center">
-                    <View className="mr-2 p-1 flex-row items-center justify-center w-5 h-5 rounded-full bg-orange-400">
-                      <Text className="text-white">{unread[item.participants.filter(x => x !== currentUser.username)[0]]?.length}</Text>
-                    </View>
-                    <Text className="text-gray-500">11:30</Text>
+
+              <View className="items px-4">
+                <Text className='text-gray-400 text-xs mb-1'>11:30</Text>
+                {hasUnread &&
+                  <View className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center">
+                    <Text className="text-white font-bold text-xs">{userUnreadMessages.length}</Text>
                   </View>
-                  :
-                  <Text className='text-gray-500'>11:30</Text>
                 }
-
               </View>
-
-
             </Pressable>
           )
         })}
-
       </ScrollView>
-    </SafeAreaWrapper>
-
+    </SafeAreaView>
   )
 }
 

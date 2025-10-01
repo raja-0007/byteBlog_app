@@ -35,7 +35,7 @@ export default function RootLayout() {
     // <ThemeProvider >
     <UserProvider>
       <SocketProvider>
-        <StatusBar style="dark" />
+        <StatusBar style="auto" />
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />

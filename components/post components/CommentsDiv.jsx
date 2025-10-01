@@ -1,27 +1,24 @@
+// CommentsDiv.jsx
 import FontAwesome from '@expo/vector-icons/FontAwesome'
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5'
 import React, { useState } from 'react'
-import { Pressable, Text, TextInput, View } from 'react-native'
+import { Pressable, Text, TextInput, View, TouchableOpacity } from 'react-native'
 import { ScrollView } from 'react-native'
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { SafeAreaView } from 'react-native-safe-area-context'
 import axios from 'axios'
 import uuid from 'react-native-uuid';
 import { useUserContext } from '@/hooks/useCurrentUser';
+
 const CommentsDiv = ({ commentsList, setCommentsList, postAuthor, commentsCount, setCommentsCount, blogId, scrollEnabled, setScrollEnabled }) => {
     const [isReply, setIsReply] = useState('')
-    const name = '1234567890'
     const { currentUser } = useUserContext()
     const [comment, setComment] = useState('')
     const [isNewComment, setIsNewComment] = useState(false)
     const [viewAll, setViewAll] = useState(false)
 
-    // console.log('commentss>>>>>>>>>>>>>>> ', blogId)
     const submitComment = async () => {
-        // console.log(' ', comment)
         const commentId = uuid.v4();
         if (comment !== '') {
-            // console.log('calling', comment)
             const newComment = {
                 commentId,
                 id: blogId,
@@ -31,7 +28,6 @@ const CommentsDiv = ({ commentsList, setCommentsList, postAuthor, commentsCount,
             }
             await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/comment`, newComment)
                 .then(res => {
-                    // console.log('comment res>>', res.data.newComments, commentsList)
                     setCommentsList([...res.data.newComments, ...commentsList])
                     setCommentsCount(res.data.commentsCount)
                     setComment('')
@@ -42,75 +38,102 @@ const CommentsDiv = ({ commentsList, setCommentsList, postAuthor, commentsCount,
 
     const viewAllComments = async () => {
         if (!viewAll) {
-            // console.log('calling commentss')
             const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/viewallcomments/${blogId}`)
-            // console.log('commentssssssssssssssss',response.data)
             let newComments = [...commentsList, ...response.data]
             const uniqueComments = Array.from(new Map(newComments.map(comment => [comment.commentId, comment])).values());
-
-            
             setCommentsList(uniqueComments)
-        }
-        else {
+        } else {
             setCommentsList(commentsList?.slice(0, 2))
         }
         setViewAll(!viewAll)
-        // setScrollEnabled(!scrollEnabled)
     }
 
     return (
-        <View className={`${viewAll ? ' h-[300px]' : 'h-auto'} relative px-5 pb-3`}><ScrollView className={`w-full   pt-0 flex flex-col  gap-5 `}
-            nestedScrollEnabled
-            contentContainerStyle={{ flexGrow: 1 }}
-        >
-            {/* <View className={`${viewAll ? 'pb-14':''}`}> */}
-            {commentsList?.map((comment, i) => {
-                return (
-                    <View key={i} className='flex flex-col gap-0 my-1'>
-                        <View className='flex w-full relative flex-row items-center'>
-                            <FontAwesome name="user-circle" size={16} color="gray" />
-                            <Text className='ms-[2px]'><Text className='font-semibold'>{comment.username}</Text> {comment.comment}</Text>
-                            {postAuthor === 'raja' && <View className="absolute right-0 flex flex-row gap-2 items-center">
-                                {/* <Text onPress={() => { isReply === '' ? setIsReply(i) : setIsReply('') }} className='text-[12px] text-gray-700'>reply</Text> */}
-                                <FontAwesome5 name="heart" size={13} color="black" />
-                            </View>}
+        <View className={`${viewAll ? 'h-[300px]' : 'h-auto'} relative`}>
+            <ScrollView 
+                className='px-4 py-2'
+                nestedScrollEnabled
+                contentContainerStyle={{ flexGrow: 1 }}
+            >
+                {commentsList?.map((comment, i) => (
+                    <View key={i} className='flex flex-col gap-1 my-2'>
+                        <View className='flex flex-row items-start gap-2'>
+                            <View className="w-7 h-7 rounded-full bg-orange-100 flex items-center justify-center mt-1">
+                                <FontAwesome name="user-circle" size={14} color="#fb923c" />
+                            </View>
+                            <View className='flex-1'>
+                                <Text className="text-gray-800">
+                                    <Text className='font-bold'>{comment.username}</Text>
+                                    <Text> {comment.comment}</Text>
+                                </Text>
+                                <View className="flex flex-row gap-4 mt-1">
+                                    <TouchableOpacity onPress={() => setIsReply(isReply === i ? '' : i)}>
+                                        <Text className='text-xs text-gray-600 font-medium'>Reply</Text>
+                                    </TouchableOpacity>
+                                    <Text className='text-xs text-gray-600'>
+                                        <FontAwesome5 name="heart" size={10} color="#6b7280" /> 1
+                                    </Text>
+                                </View>
+                            </View>
                         </View>
-                        <View className="flex flex-row gap-5 mx-5 items-center">
-                            <Text onPress={() => { isReply === '' ? setIsReply(i) : setIsReply('') }} className='text-[12px] text-gray-700'>reply</Text>
-                            <Text className='text-[12px] text-gray-700'><FontAwesome5 name="heart" size={10} color="black" />1 like</Text>
-                        </View>
-                        {(isReply == i && isReply !== '') && <View className='px-3 mt-2 flex flex-row items-center justify-center  gap-3'>
-                            {/* <Text>reply: @{name.slice(0,20)}</Text> */}
-                            <TextInput multiline returnKeyType='send' placeholder={`reply @${comment.username}`} className='border rounded-md border-gray-300 w-[90%] h-12' />
-                            <MaterialCommunityIcons name="send" size={24} color="black" />
-                        </View>}
+                        
+                        {isReply === i && (
+                            <View className='ml-9 mt-2 flex flex-row items-center gap-2'>
+                                <TextInput
+                                    multiline
+                                    returnKeyType='send'
+                                    placeholder={`Reply to @${comment.username}`}
+                                    className='flex-1 border border-gray-300 rounded-lg px-3 py-2 bg-gray-50'
+                                    placeholderTextColor="#9ca3af"
+                                />
+                                <TouchableOpacity className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
+                                    <MaterialCommunityIcons name="send" size={18} color="white" />
+                                </TouchableOpacity>
+                            </View>
+                        )}
                     </View>
+                ))}
+            </ScrollView>
 
-                )
-            })}
-            {/* </View> */}
-
-
-
-
-
-        </ScrollView>
-            <View className={`${viewAll ? '' : ''} w-full mt-2`}>
-                <View className='flex w-full px-3 flex-row gap-4 justify-start'>
-                {commentsList?.length !==0 && <Pressable onPress={viewAllComments}><Text>{viewAll ? 'view less' : 'view all'}</Text></Pressable>}
-                    {!viewAll && <Pressable onPress={() => { setIsNewComment(!isNewComment) }}><Text>{!isNewComment ? 'add comment' : 'cancel'}</Text></Pressable>}
+            <View className='px-4 pb-3 mt-2 border-t border-gray-100 pt-3'>
+                <View className='flex flex-row gap-4 mb-3'>
+                    {commentsList?.length !== 0 && (
+                        <TouchableOpacity onPress={viewAllComments}>
+                            <Text className="text-orange-500 font-semibold text-sm">
+                                {viewAll ? 'View Less' : `View All ${commentsCount} Comments`}
+                            </Text>
+                        </TouchableOpacity>
+                    )}
+                    {!viewAll && (
+                        <TouchableOpacity onPress={() => setIsNewComment(!isNewComment)}>
+                            <Text className="text-gray-600 font-semibold text-sm">
+                                {!isNewComment ? 'Add Comment' : 'Cancel'}
+                            </Text>
+                        </TouchableOpacity>
+                    )}
                 </View>
 
-                {(isNewComment || viewAll ) && <View className={` flex  flex-col gap-0 mt-3`}>
-                    <View className='px-3 flex flex-row items-center justify-center  gap-3'>
-                        <TextInput multiline returnKeyType='send' value={comment} onChangeText={setComment} placeholder={`comment...`} className='border rounded-md border-gray-300 w-[90%] h-12' />
-                        <MaterialCommunityIcons name="send" size={24} color="black" onPress={submitComment} />
+                {(isNewComment || viewAll) && (
+                    <View className='flex flex-row items-center gap-2'>
+                        <TextInput
+                            multiline
+                            returnKeyType='send'
+                            value={comment}
+                            onChangeText={setComment}
+                            placeholder='Write a comment...'
+                            className='flex-1 border-2 border-gray-200 rounded-xl px-4 py-3 bg-white'
+                            placeholderTextColor="#9ca3af"
+                        />
+                        <TouchableOpacity 
+                            onPress={submitComment}
+                            className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center shadow-sm"
+                        >
+                            <MaterialCommunityIcons name="send" size={20} color="white" />
+                        </TouchableOpacity>
                     </View>
-                </View>}
+                )}
             </View>
         </View>
-
-
     )
 }
 
