@@ -43,7 +43,7 @@ export default function RootLayout() {
           <Stack.Screen name="messenger/[chatPage]" options={{ headerShown: false }} />
           <Stack.Screen name="authentication/login" options={{ headerShown: false }} />
           <Stack.Screen name="authentication/register" options={{ headerShown: false }} />
-          <Stack.Screen name="post_page/[postId]" options={{ title: 'Blog Overview' }} />
+          <Stack.Screen name="post_page/[postId]" options={{ headerShown: false }} />
           <Stack.Screen name="profile_page/[profile]" options={{ title: 'Profile Page' }} />
 
         </Stack>

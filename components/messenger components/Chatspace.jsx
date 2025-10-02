@@ -1,8 +1,7 @@
-import { View, Text, ScrollView, Pressable } from 'react-native'
+import { View, Text, ScrollView } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { FontAwesome } from '@expo/vector-icons'
 import { useUserContext } from '@/hooks/useCurrentUser'
-
 
 const Chatspace = ({ messages }) => {
   const [groupedMessages, setGroupedMessages] = useState({})
@@ -11,35 +10,27 @@ const Chatspace = ({ messages }) => {
   const { currentUser } = useUserContext()
 
   useEffect(() => {
-
     if (messages.length > 0) {
       const groupedData = groupChatsByDate(messages, sortGroupedChats)
       setGroupedMessages(groupedData)
-
     }
   }, [messages])
 
   useEffect(() => {
     if (chatSpaceRef && chatSpaceRef.current) {
-      // setTimeout(() => {
       chatSpaceRef.current.scrollToEnd({ animated: false })
-
-      // }, 0.1);
     }
   }, [groupedMessages])
 
   const handleContentSizeChange = (contentWidth, contentHeight) => {
     if (contentHeight > 0 && !isContentLoaded) {
-      setIsContentLoaded(true); // Set flag to indicate content is loaded
+      setIsContentLoaded(true);
     }
   };
 
-
   function sortGroupedChats(groupedChats) {
-    // Sort the grouped chats by date
     const sortedGroupedChats = Object.keys(groupedChats)
       .sort((a, b) => {
-        // Convert dd/mm/yyyy to a Date object for comparison
         const dateA = new Date(a.split('/').reverse().join('-'));
         const dateB = new Date(b.split('/').reverse().join('-'));
         return dateA - dateB;
@@ -48,9 +39,9 @@ const Chatspace = ({ messages }) => {
         sortedAcc[date] = groupedChats[date];
         return sortedAcc;
       }, {});
-      // console.log('sortedGroupedChatssortedGroupedChatssortedGroupedChatssortedGroupedChats',sortedGroupedChats)
     return sortedGroupedChats;
   }
+
   function groupChatsByDate(chats, callback) {
     const groupedChats = chats.reduce((acc, chat) => {
       const { date } = chat;
@@ -63,58 +54,82 @@ const Chatspace = ({ messages }) => {
     if (callback && typeof callback === "function") {
       return callback(groupedChats);
     }
-  
     return groupedChats;
   }
 
   function extractTime(isoString) {
     const date = new Date(isoString);
-    const options = { hour: '2-digit', minute: '2-digit', hour12: false };
+    const options = { hour: '2-digit', minute: '2-digit', hour12: true };
     return date.toLocaleString([], options);
-}
+  }
 
   return (
-    <ScrollView ref={chatSpaceRef} className='h-[84vh] relative flex flex-col gap-2 px-2' contentContainerStyle={{ paddingBottom: 20 }}>
+    <ScrollView 
+      ref={chatSpaceRef} 
+      className='flex-1 bg-gray-50 px-4' 
+      contentContainerStyle={{ paddingBottom: 20, paddingTop: 16 }}
+      showsVerticalScrollIndicator={false}
+    >
       {Object.keys(groupedMessages).map((date, di) => {
         return (
-          <View className='flex flex-col gap-5 mt-7' key={di}>
-            <View className='flex flex-row px-5 items-center justify-between'>
-              <View className='h-[1px] w-[35%] bg-gray-400'></View>
-              <Text style={{
-                alignSelf: 'flex-start',
-                // textAlign: 'right',
-              }} className='bg-gray-500 text-white p-1 py-0 text-sm mx-auto rounded-md w-[max-content]'>{date}</Text>
-              <View className='h-[1px] w-[35%] bg-gray-400'></View>
+          <View className='flex flex-col gap-3 mb-6' key={di}>
+            {/* Date Separator */}
+            <View className='flex flex-row items-center justify-center mb-2'>
+              <View className='h-[0.5px] flex-1 bg-gray-300'></View>
+              <Text className='bg-gray-200 text-gray-600 px-4 py-1 text-xs font-medium mx-3 rounded-full'>
+                {date}
+              </Text>
+              <View className='h-[0.5px] flex-1 bg-gray-300'></View>
             </View>
 
-
+            {/* Messages */}
             {groupedMessages[date].map((message, i) => {
               const sentAt = extractTime(message.sentAt)
+              const isCurrentUser = message.from === currentUser.username
+              
               return (
-                <View key={i} className={` max-w-[70%] flex gap-1 items-end ${message.from == currentUser.username ? 'self-end flex-row-reverse' : 'flex-row'}`}>
-                  <FontAwesome name="user-circle" size={20} color="black" className='' />
-                  <View className='bg-gray-200 relative p-2 rounded-md min-w-[50px]'><Text style={{
-                    alignSelf: 'flex-start',
-                    // textAlign: 'right',
-                  }}
-                    className='w-[max-content]'>{message.message}</Text>
-                    <Text className='text-end  self-end text-[10px]'>{sentAt}</Text>
+                <View 
+                  key={i} 
+                  className={`max-w-[80%] flex gap-2 ${isCurrentUser ? 'self-end flex-row-reverse' : 'flex-row'}`}
+                >
+                  {/* Avatar */}
+                  <View className={`h-8 w-8 rounded-full ${isCurrentUser ? 'bg-orange-500' : 'bg-blue-500'} flex items-center justify-center shadow-sm`}>
+                    <FontAwesome name="user" size={14} color="white" />
                   </View>
-
+                  
+                  {/* Message Bubble */}
+                  <View className='flex-'>
+                    <View 
+                      className={`p-3 rounded-2xl shadow-sm ${
+                        isCurrentUser 
+                          ? 'bg-orange-100 rounded-tr-sm border border-orange-300' 
+                          : 'bg-white rounded-tl-sm border border-gray-200'
+                      }`}
+                    >
+                      <Text 
+                        className={`text-base leading-5 ${
+                          isCurrentUser ? 'text-gray-800' : 'text-gray-800'
+                        }`}
+                      >
+                        {message.message}
+                      </Text>
+                    </View>
+                    
+                    {/* Timestamp */}
+                    <Text 
+                      className={`text-[10px] text-gray-500 mt-1 ${
+                        isCurrentUser ? 'text-right' : 'text-left'
+                      }`}
+                    >
+                      {sentAt}
+                    </Text>
+                  </View>
                 </View>
               )
             })}
-
           </View>
         )
       })}
-
-      {/* <Text className='py-20'>[chatPage]</Text>
-      <Text className='py-20'>[chatPage]</Text>
-      <Text className='py-20'>[chatPage]</Text>
-      <Text className='py-20'>[chatPage]</Text>
-      <Text className='py-20'>[chatPage]</Text>
-      <Text className='py-20'>[chatPage]</Text> */}
     </ScrollView>
   )
 }

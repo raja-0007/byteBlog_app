@@ -1,5 +1,6 @@
-import { View, Text, TextInput, StyleSheet, Pressable } from 'react-native'
+import { View, Text, TextInput, StyleSheet, Pressable, ScrollView, KeyboardAvoidingView, Platform } from 'react-native'
 import React from 'react'
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 export default function AddText({ postData, setPostData, submitHandler }) {
   
@@ -7,66 +8,88 @@ export default function AddText({ postData, setPostData, submitHandler }) {
     setPostData({ ...postData, [label]: e.nativeEvent.text });
   };
 
+  const isFormValid = postData.title.trim() && postData.description.trim() && postData.content.trim();
+
   return (
-    <View className="px-6 py-8 bg-gray-50 flex h-full flex-col items-center">
-      
-      {/* Header */}
-      <Text className="text-center text-gray-600 text-sm leading-5 mb-4">
-        ✨ Fill in the details for your blog post. 
-      </Text>
+    <ScrollView className="flex-1 bg-gray-50">
+      <View className="px-6 py-6 flex flex-col">
+        
+        {/* Header Section */}
+        <View className="bg-white- rounded-2xl p- mb-6 shadow-sm- border- border-gray-100">
+          <View className="flex flex-row items-center mb-3">
+            <View className="bg-orange-100 rounded-full p-2 mr-3">
+              <MaterialIcons name="create" size={24} color="#f97316" />
+            </View>
+            <View>
+              <Text className="text-xl font-bold text-gray-800">Create Your Blog</Text>
+              <Text className="text-sm text-gray-500">Share your thoughts with the world</Text>
+            </View>
+          </View>
+        </View>
 
-      {/* Title Input */}
-      <TextInput
-        value={postData.title}
-        onChange={(e) => changeHandler(e, 'title')}
-        placeholder="Enter Blog Title"
-        className="border border-gray-300 rounded-lg p-4 mb-3 h-14 w-full shadow-sm bg-white text-gray-700"
-      />
-
-      {/* Caption Input */}
-      <TextInput
-        multiline
-        style={styles.textInput}
-        value={postData.caption}
-        onChange={(e) => changeHandler(e, 'caption')}
-        placeholder="Write a caption..."
-        className="border border-gray-300 rounded-lg p-4 h-16 w-full shadow-sm bg-white text-gray-700"
-      />
-
-      {/* Blog Content Section */}
-      <View className="w-full p-4 rounded-lg bg-white shadow-sm mt-4 border border-gray-200">
-        <Text className="text-gray-600 text-base font-medium mb-3">📖 Blog Content</Text>
+        {/* Title Input */}
+        <View className="mb-4">
+          <Text className="text-sm font-semibold text-gray-700 mb-2 ml-1">Blog Title *</Text>
+          <TextInput
+            value={postData.title}
+            onChange={(e) => changeHandler(e, 'title')}
+            placeholder="Enter an engaging title..."
+            placeholderTextColor="#9ca3af"
+            className="border-2 border-gray-200 rounded-xl p-4 bg-white text-gray-800 text-lg shadow-sm"
+          />
+        </View>
 
         {/* Description Input */}
-        <TextInput
-          multiline
-          style={styles.textInput}
-          value={postData.description}
-          onChange={(e) => changeHandler(e, 'description')}
-          placeholder="Short description about your blog..."
-          className="border border-gray-300 rounded-lg p-4 mb-4 h-20 w-full bg-gray-50 text-gray-700"
-        />
+        <View className="mb-4">
+          <Text className="text-sm font-semibold text-gray-700 mb- ml-1">Introduction *</Text>
+          <Text className="text-xs text-gray-500 mb-2 ml-1">A brief intro to hook your readers</Text>
+          <TextInput
+            multiline
+            style={styles.textInput}
+            value={postData.description}
+            onChange={(e) => changeHandler(e, 'description')}
+            placeholder="Write a compelling introduction that summarizes your blog..."
+            placeholderTextColor="#9ca3af"
+            className="border-2 border-gray-200 rounded-xl p-4 h-28 bg-white text-gray-800 shadow-sm"
+          />
+        </View>
 
         {/* Content Input */}
-        <TextInput
-          multiline
-          style={[styles.textInput, { height: 250 }]}
-          value={postData.content}
-          onChange={(e) => changeHandler(e, 'content')}
-          placeholder="Start writing your blog here..."
-          className="border border-gray-300 rounded-lg p-4 w-full bg-gray-50 text-gray-700"
-        />
+        <View className="mb-6">
+          <Text className="text-sm font-semibold text-gray-700 mb- ml-1">Blog Content *</Text>
+          <Text className="text-xs text-gray-500 mb-2 ml-1">Share your story, insights, or knowledge</Text>
+          
+
+          <TextInput
+            multiline
+            style={[styles.textInput, { minHeight: 300, maxHeight:350 }]}
+            value={postData.content}
+            onChange={(e) => changeHandler(e, 'content')}
+            placeholder="Start writing your blog content here...&#10;&#10;You can write multiple paragraphs, share your experiences, provide tips, or tell your story."
+            placeholderTextColor="#9ca3af"
+            className="border-2 border-gray-200 rounded-xl p-4 bg-white text-gray-800 shadow-sm"
+          />
+        </View>
+
+        {/* Submit Button */}
+        <Pressable 
+          className={`p-4 rounded-xl flex flex-row items-center justify-center gap-2 shadow-md mb-6 ${
+            isFormValid ? 'bg-orange-500 active:bg-orange-600' : 'bg-gray-300'
+          }`}
+          onPress={submitHandler}
+          disabled={!isFormValid}
+        >
+          <MaterialIcons name="publish" size={24} color="white" />
+          <Text className="text-white font-bold text-lg">Publish Blog</Text>
+        </Pressable>
+
+        {!isFormValid && (
+          <Text className="text-center text-gray-500 text-sm mb-4">
+            Please fill in all required fields
+          </Text>
+        )}
       </View>
-
-      {/* Submit Button */}
-      <Pressable 
-        className="mt-6 bg-orange-500 p-4 rounded-lg w-36 flex items-center shadow-md active:bg-orange-600"
-        onPress={submitHandler}
-      >
-        <Text className="text-white font-semibold text-lg">Post</Text>
-      </Pressable>
-
-    </View>
+    </ScrollView>
   );
 }
 

@@ -19,7 +19,8 @@
       "permissions": [
         "android.permission.RECORD_AUDIO"
       ],
-      "package": "com.rajagoud.byteBlogApp"
+      "package": "com.rajagoud.byteBlogApp",
+      "softwareKeyboardLayoutMode": "pan"
     },
     "web": {
       "bundler": "metro",

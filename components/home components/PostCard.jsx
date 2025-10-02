@@ -10,7 +10,7 @@ import { useUserContext } from '@/hooks/useCurrentUser';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const PostCard = ({ post, scrollEnabled, setScrollEnabled }) => {
-    const [isDescription, setIsDescription] = useState(false)
+    const [isDescription, setIsDescription] = useState(true)
     const [commentsList, setCommentsList] = useState(post.comments)
     const [commentsCount, setCommentsCount] = useState(post.commentsCount)
     const { currentUser } = useUserContext()
@@ -47,7 +47,7 @@ const PostCard = ({ post, scrollEnabled, setScrollEnabled }) => {
     }
 
     return (
-        <View className='mb- bg-white rounded- overflow-hidden shadow-sm mx- mt-'>
+        <View className='mb- bg-white rounded- border-t border-gray-100  overflow-hidden shadow-sm mx- mt-'>
             {/* Author Header */}
             <Pressable 
                 onPress={() => router.push(`/profile_page/${post.authorId}`)} 
@@ -81,16 +81,16 @@ const PostCard = ({ post, scrollEnabled, setScrollEnabled }) => {
                     <View className='absolute inset-0 px-6 z-10 flex justify-center' style={{ backgroundColor: 'rgba(0, 0, 0, 0.7)' }}>
                         <View>
                             <Text className='text-center text-white font-bold text-3xl uppercase mb-3'>{post.title}</Text>
-                            <Pressable onPress={() => setIsDescription(!isDescription)}>
+                            {/* <Pressable onPress={() => setIsDescription(!isDescription)}>
                                 <Text className='text-center text-orange-400 underline font-semibold'>
                                     {isDescription ? 'Hide Description' : 'Read Description'}
                                 </Text>
-                            </Pressable>
+                            </Pressable> */}
                         </View>
 
-                        {isDescription && (
-                            <View className='mt-8'>
-                                <Text className='text-white text-base leading-6 mb-4'>
+                        {/* {isDescription && ( */}
+                            <View className='mt-2'>
+                                <Text numberOfLines={3} className='text-gray-400 text-base leading-6 mb-4'>
                                     {post.description.slice(0, 300)}{post.description.length > 300 && '...'}
                                 </Text>
                                 <TouchableOpacity 
@@ -100,13 +100,13 @@ const PostCard = ({ post, scrollEnabled, setScrollEnabled }) => {
                                     <Text className='text-white font-semibold'>View Blog</Text>
                                 </TouchableOpacity>
                             </View>
-                        )}
+                        {/* )} */}
                     </View>
                 )}
             </TouchableOpacity>
 
             {/* Interactions */}
-            <View className='px-4 py-3 gap-5 flex flex-row items-center border-b border-gray-100'>
+            <View className='px-4 py-3 gap-5 flex flex-row items-center border-b- border-gray-100'>
                 <TouchableOpacity 
                     onPress={() => likeHandler(liked ? 'unlike' : 'like')} 
                     className='flex flex-row items-center gap-2'
@@ -128,18 +128,18 @@ const PostCard = ({ post, scrollEnabled, setScrollEnabled }) => {
             </View>
 
             {/* Caption */}
-            {post.caption !== '' && (
+            {/* {post.caption !== '' && (
                 <View className='px-4 py-3 border-b border-gray-100'>
                     <Text className="text-gray-800">
                         <Text className='font-bold'>{post.username}</Text>
                         <Text> {post.caption}</Text>
                     </Text>
                 </View>
-            )}
+            )} */}
 
             {/* Comments Section */}
             {commentsList.length === 0 && (
-                <View className='px-4 py-3'>
+                <View className='px-4 py-'>
                     <Text className='text-sm text-gray-500'>No comments yet</Text>
                 </View>
             )}

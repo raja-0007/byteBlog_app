@@ -39,6 +39,7 @@ export default function TabLayout() {
           title: 'New',
           tabBarIcon: ({ color, size }) => <Octicons name="diff-added" size={size} color={color} />,
           headerTitle: 'New Post',
+          headerShown:false
         }}
       />
       <Tabs.Screen

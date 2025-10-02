@@ -53,15 +53,18 @@ const index = () => {
     }
   }
 
-  useFocusEffect(
-    useCallback(() => {
-      // console.log('Fetching chats...');
-      getChats();
-      return () => {
-        // console.log('Cleanup on screen blur');
-      };
-    }, [currentUser]) // Re-run if currentUser changes
-  )
+  useEffect(()=>{
+    getChats();
+  },[])
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     // console.log('Fetching chats...');
+  //     getChats();
+  //     return () => {
+  //       // console.log('Cleanup on screen blur');
+  //     };
+  //   }, [currentUser]) // Re-run if currentUser changes
+  // )
 
   useEffect(() => {
     if (ws) {

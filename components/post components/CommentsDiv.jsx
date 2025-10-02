@@ -95,7 +95,7 @@ const CommentsDiv = ({ commentsList, setCommentsList, postAuthor, commentsCount,
                 ))}
             </ScrollView>
 
-            <View className='px-4 pb-3 mt-2 border-t border-gray-100 pt-3'>
+            <View className='px-4 pb-3 mt- border-t- border-gray-100 pt-'>
                 <View className='flex flex-row gap-4 mb-3'>
                     {commentsList?.length !== 0 && (
                         <TouchableOpacity onPress={viewAllComments}>
