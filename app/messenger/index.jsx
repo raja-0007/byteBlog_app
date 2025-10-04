@@ -146,7 +146,6 @@ const index = () => {
           const otherUser = item.participants.find(x => x !== currentUser.username);
           const userUnreadMessages = unread[otherUser] || [];
           const hasUnread = userUnreadMessages.length > 0;
-
           return (
             // Using Pressable for better feedback on touch
             <Pressable

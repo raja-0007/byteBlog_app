@@ -16,7 +16,7 @@ const ChatHeader = ({ title, type, active, sendMessage }) => {
                 <>
                     <FontAwesome6 name="facebook-messenger" size={28} color="#0084ff" />
                     <View>
-                        <Text className='text-2xl font-bold text-gray-800'>{title}</Text>
+                        <Text className='text-2xl ml-2 capitalize font-bold text-gray-800'>{title}</Text>
                     </View>
                 </>
             ) : (
