@@ -28,7 +28,7 @@ const CommentsDiv = ({ commentsList, setCommentsList, postAuthor, commentsCount,
             }
             await axios.post(`${process.env.EXPO_PUBLIC_BASE_URL}/comment`, newComment)
                 .then(res => {
-                    setCommentsList([...res.data.newComments, ...commentsList])
+                    setCommentsList([...res.data.newComments, ...commentsList].slice(0, 2))
                     setCommentsCount(res.data.commentsCount)
                     setComment('')
                     setIsNewComment(false)
@@ -78,26 +78,34 @@ const CommentsDiv = ({ commentsList, setCommentsList, postAuthor, commentsCount,
                         </View>
                         
                         {isReply === i && (
-                            <View className='ml-9 mt-2 flex flex-row items-center gap-2'>
-                                <TextInput
-                                    multiline
-                                    returnKeyType='send'
-                                    placeholder={`Reply to @${comment.username}`}
-                                    className='flex-1 border border-gray-300 rounded-lg px-3 py-2 bg-gray-50'
-                                    placeholderTextColor="#9ca3af"
-                                />
-                                <TouchableOpacity className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
-                                    <MaterialCommunityIcons name="send" size={18} color="white" />
-                                </TouchableOpacity>
-                            </View>
-                        )}
+    <View className='ml-9 mt-2 flex flex-row items-center gap-2'>
+        <TextInput
+            multiline
+            returnKeyType='send'
+            placeholder={`Reply to @${comment.username}`}
+            className='flex-1 border border-gray-300 rounded-lg px-3 py-2 bg-gray-50'
+            placeholderTextColor="#9ca3af"
+        />
+        <TouchableOpacity className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center">
+            <MaterialCommunityIcons name="send" size={18} color="white" />
+        </TouchableOpacity>
+
+        {/* Cancel Button */}
+        <TouchableOpacity
+  onPress={() => setIsReply('')}
+  className="px-2 py-2 active:opacity-70"
+>
+  <Text className="text-xs text-gray-500 font-medium underline">Cancel</Text>
+</TouchableOpacity>
+    </View>
+)}
                     </View>
                 ))}
             </ScrollView>
 
             <View className='px-4 pb-3 mt- border-t- border-gray-100 pt-'>
                 <View className='flex flex-row gap-4 mb-3'>
-                    {commentsList?.length !== 0 && (
+                    {commentsCount !== 0 && commentsCount > 2  && (
                         <TouchableOpacity onPress={viewAllComments}>
                             <Text className="text-orange-500 font-semibold text-sm">
                                 {viewAll ? 'View Less' : `View All ${commentsCount} Comments`}

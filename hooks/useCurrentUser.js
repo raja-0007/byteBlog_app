@@ -12,12 +12,12 @@ export const UserProvider = ({ children }) => {
 
   const setCurrentUser = async (userData) => {
     try {
+      setUserState(userData);
       if (userData) {
         await AsyncStorage.setItem("user", JSON.stringify(userData));
       } else {
         await AsyncStorage.removeItem("user"); // for logout
       }
-      setUserState(userData);
     } catch (error) {
       console.log("Error saving user:", error);
     }

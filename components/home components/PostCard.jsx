@@ -60,7 +60,7 @@ const PostCard = ({ post, scrollEnabled, setScrollEnabled }) => {
             </Pressable>
 
             {/* Image with Overlay */}
-            <TouchableOpacity onPress={handleclick} className='h-[400px] w-full relative'>
+            <Pressable onPress={handleclick} className='h-[400px] w-full relative'>
                 <Image 
                     source={{ uri: `${process.env.EXPO_PUBLIC_BASE_URL}/images/${post.image}` }} 
                     className='w-full h-full'
@@ -103,7 +103,7 @@ const PostCard = ({ post, scrollEnabled, setScrollEnabled }) => {
                         {/* )} */}
                     </View>
                 )}
-            </TouchableOpacity>
+            </Pressable>
 
             {/* Interactions */}
             <View className='px-4 py-3 gap-5 flex flex-row items-center border-b- border-gray-100'>

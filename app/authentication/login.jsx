@@ -35,7 +35,7 @@ const Login = () => {
         alert(response.data.status);
       } else {
         console.log(response.data);
-        setCurrentUser(response.data);
+        await setCurrentUser(response.data);
         router.replace('(tabs)');
       }
     } catch (error) {
