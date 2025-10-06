@@ -30,7 +30,9 @@ const chatPage = () => {
     })
     .then((res)=>{
       console.log(res.data)
-      setMessages(res.data)
+      // setMessages(res.data)
+    }).catch((err)=>{
+      console.log('err', err)
     })
   }
   const wsRef = useRef(null);
@@ -61,7 +63,10 @@ const chatPage = () => {
 
   useEffect(()=>{
     if(roomId){
-      getMessages()
+      const timer = setTimeout(() => {
+        getMessages();
+      }, 0); // 30ms delay is enough, even 0ms works sometimes  ---- add 30ms if messages not coming
+      return () => clearTimeout(timer);
     }
   },[roomId])
 

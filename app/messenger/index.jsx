@@ -67,21 +67,31 @@ const index = () => {
   // )
 
   useEffect(() => {
-    if (ws) {
-      ws.on('new_message', (data) => {
-        // console.log('Message from server:', data)
-        // Your existing WebSocket logic
+    if (!ws || !currentUser) return;
+    const handleStatus = ({ username, status }) => {
+      console.log('Message from server:', username, status, chats)
+      setActiveUsers((prev) => {
+        const user = chats.find(c => c.participants.includes(username) && username !== currentUser.username);
+        console.log('user', user)
+        if (!user) return prev;
+  
+        if (status === "online") {
+          const alreadyOnline = prev.some(u => u.username === username);
+          if (!alreadyOnline) return [...prev, { username }];
+          return prev;
+        } else if (status === "offline") {
+          return prev.filter(u => u.username !== username);
+        }
+        return prev;
       });
-    } else {
-      console.log('socket not connected')
     }
-
+  
+    ws.on('update-user-status', handleStatus);
+  
     return () => {
-      if (ws) {
-        ws.off('new_message'); // Cleanup event listener
-      }
+      ws.off('update-user-status', handleStatus);
     };
-  }, [ws]); // Dependency on 'ws'
+  }, [ws, chats, currentUser.username]);
 
   return (
     // Changed SafeAreaView background to a soft orange

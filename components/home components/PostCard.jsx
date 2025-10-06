@@ -91,7 +91,7 @@ const PostCard = ({ post, scrollEnabled, setScrollEnabled }) => {
                         {/* {isDescription && ( */}
                             <View className='mt-2'>
                                 <Text numberOfLines={3} className='text-gray-400 text-base leading-6 mb-4'>
-                                    {post.description.slice(0, 300)}{post.description.length > 300 && '...'}
+                                    {post?.description?.slice(0, 300)}{post?.description?.length > 300 && '...'}
                                 </Text>
                                 <TouchableOpacity 
                                     onPress={() => router.push(`/post_page/${post._id}`)}

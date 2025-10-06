@@ -7,6 +7,7 @@ import uuid from 'react-native-uuid';
 import axios from 'axios'
 import { useFocusEffect } from "@react-navigation/native";
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { Platform } from 'react-native';
 
 const HomePage = () => {
     const [refreshing, setRefreshing] = useState(false);
@@ -117,7 +118,10 @@ const HomePage = () => {
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#fb923c']} />
                 }
                 ref={scrollViewRef} 
-                onScroll={(event) => { event.persist(); handlescrollbottom(event) }} 
+                onScroll={(event) => { 
+                    if (Platform.OS !== 'web') event.persist();
+                     handlescrollbottom(event)
+                 }} 
                 scrollEventThrottle={16} 
                 contentContainerStyle={{ paddingBottom: 20 }}
                 showsVerticalScrollIndicator={false}

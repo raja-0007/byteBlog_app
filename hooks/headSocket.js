@@ -7,7 +7,7 @@ const SocketContext = createContext();
 
 
 export const SocketProvider = ({ children }) => {
-    const { setUnread } = useUserContext()
+    const { setUnread, setActiveUsers } = useUserContext()
     const [ws, setWs] = useState(null);
     const [socketID, setSocketID] = useState(null)
     const [roomId, setRoomId] = useState(null)
@@ -59,11 +59,16 @@ export const SocketProvider = ({ children }) => {
         }
     }
 
+    const disconnectSocket = async()=>{
+        ws.disconnect()
+        setWs(null)
+    }
+
     return (
         <SocketContext.Provider value={{ 
             ws, setWs, 
             connectSocket, 
-            socketID, roomId, 
+            socketID, roomId, disconnectSocket
          }}>
             {children}
         </SocketContext.Provider>

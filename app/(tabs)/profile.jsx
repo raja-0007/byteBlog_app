@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, ScrollView, Pressable } from 'react-native';
 import { FontAwesome, MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { useUserContext } from '@/hooks/useCurrentUser';
+import { useSocketContext } from '@/hooks/headSocket';
 import axios from 'axios';
 import { router } from 'expo-router';
 
 const Profile = () => {
-    const { currentUser } = useUserContext();
+    const { currentUser, setCurrentUser } = useUserContext();
+    const { disconnectSocket } = useSocketContext()
     const [blogs, setBlogs] = useState([]);
     const [activeTab, setActiveTab] = useState('grid'); // 'grid' or 'list'
 
@@ -24,8 +26,20 @@ const Profile = () => {
     };
 
     useEffect(() => {
-        getPosts();
+        if(currentUser){
+
+            getPosts();
+        }
     }, [currentUser]);
+
+    if (!currentUser) {
+        // Optionally show a loading or redirect to login
+        return (
+          <View className="flex-1 items-center justify-center bg-gray-50">
+            <Text className="text-gray-500">Loading...</Text>
+          </View>
+        );
+      }
 
     return (
         <ScrollView className="flex-1 bg-gray-50">
@@ -50,10 +64,25 @@ const Profile = () => {
                 <Text className="text-sm text-gray-600 mb-4">{currentUser.email}</Text>
 
                 {/* Edit Profile Button */}
-                <Pressable className="flex-row items-center gap-2 bg-white px-5 py-2.5 rounded-full border-2 border-orange-500">
-                    <MaterialIcons name="edit" size={18} color="#f97316" />
-                    <Text className="text-orange-500 font-semibold text-sm">Edit Profile</Text>
-                </Pressable>
+                <View className="flex-row items-center gap-3">
+                    <Pressable className="flex-row items-center gap-2 bg-white px-5 py-2.5 rounded-full border-2 border-orange-500">
+                        <MaterialIcons name="edit" size={18} color="#f97316" />
+                        <Text className="text-orange-500 font-semibold text-sm">Edit Profile</Text>
+                    </Pressable>
+                    <Pressable
+                        onPress={async() => {
+                            // Perform logout logic here
+                            // Example: AsyncStorage.clear(), then router.replace('/login')
+                            await disconnectSocket()
+                            await setCurrentUser(null);
+                            router.replace('/authentication/login');
+                        }}
+                        className="flex-row items-center gap-2 bg-orange-500 px-5 py-2.5 rounded-full shadow-md active:opacity-80"
+                    >
+                        <MaterialIcons name="logout" size={18} color="white" />
+                        <Text className="text-white font-semibold text-sm">Logout</Text>
+                    </Pressable>
+                </View>
             </View>
 
             {/* Stats Section */}
@@ -78,13 +107,13 @@ const Profile = () => {
             <View className="flex-row justify-between items-center px-5 mb-4">
                 <Text className="text-xl font-bold text-gray-900">My Posts</Text>
                 <View className="flex-row bg-white rounded-lg p-1 shadow-sm">
-                    <Pressable 
+                    <Pressable
                         onPress={() => setActiveTab('grid')}
                         className={`p-2 rounded-md ${activeTab === 'grid' ? 'bg-orange-50' : ''}`}
                     >
                         <Ionicons name="grid" size={20} color={activeTab === 'grid' ? '#f97316' : '#9ca3af'} />
                     </Pressable>
-                    <Pressable 
+                    <Pressable
                         onPress={() => setActiveTab('list')}
                         className={`p-2 rounded-md ${activeTab === 'list' ? 'bg-orange-50' : ''}`}
                     >
@@ -101,12 +130,12 @@ const Profile = () => {
                         <View className="flex-row flex-wrap -mx-1">
                             {blogs.map((item) => (
                                 <View key={item._id} className="w-1/3 p-1">
-                                    <Pressable 
+                                    <Pressable
                                         onPress={() => router.push(`/post_page/${item._id}`)}
                                         className="relative"
                                     >
-                                        <Image 
-                                            source={{ uri: `${process.env.EXPO_PUBLIC_BASE_URL}/images/${item.image}` }} 
+                                        <Image
+                                            source={{ uri: `${process.env.EXPO_PUBLIC_BASE_URL}/images/${item.image}` }}
                                             className="w-full aspect-square rounded-lg bg-gray-200"
                                             resizeMode="cover"
                                         />
@@ -121,13 +150,13 @@ const Profile = () => {
                         // List View
                         <View className="gap-3">
                             {blogs.map((item) => (
-                                <Pressable 
+                                <Pressable
                                     key={item._id}
                                     onPress={() => router.push(`/post_page/${item._id}`)}
                                     className="flex-row bg-white rounded-xl p-3 shadow-sm"
                                 >
-                                    <Image 
-                                        source={{ uri: `${process.env.EXPO_PUBLIC_BASE_URL}/images/${item.image}` }} 
+                                    <Image
+                                        source={{ uri: `${process.env.EXPO_PUBLIC_BASE_URL}/images/${item.image}` }}
                                         className="w-20 h-20 rounded-lg bg-gray-200"
                                         resizeMode="cover"
                                     />
@@ -165,7 +194,7 @@ const Profile = () => {
                     <Text className="text-sm text-gray-600 text-center mb-6">
                         Start sharing your thoughts with the world!
                     </Text>
-                    <Pressable 
+                    <Pressable
                         className="flex-row items-center gap-2 bg-orange-500 px-6 py-3.5 rounded-xl shadow-lg"
                         onPress={() => router.push('/newPost')}
                     >

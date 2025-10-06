@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
@@ -16,7 +15,7 @@ export const UserProvider = ({ children }) => {
       if (userData) {
         await AsyncStorage.setItem("user", JSON.stringify(userData));
       } else {
-        await AsyncStorage.removeItem("user"); // for logout
+        await AsyncStorage.removeItem("user"); // for logout        
       }
     } catch (error) {
       console.log("Error saving user:", error);
