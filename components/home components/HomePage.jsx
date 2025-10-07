@@ -18,19 +18,30 @@ const HomePage = () => {
     const scrollViewRef = useRef(null)
     const [scrollEnabled, setScrollEnabled] = useState(true)
     const [isLoading, setIsLoading] = useState(true);
+    const [totalPages, setTotalPages] = useState(null)
+    const [page, setPage] = useState(1)
 
-    const onRefresh = useCallback(() => {
+    const onRefresh = useCallback(async() => {
         setRefreshing(true);
-        getBlogs()
-        setTimeout(() => {
+        setPage(1)
+        setIsAtBottom(false)
+        setIsScrollEnabled(true)
+        await getBlogs()
+        // setTimeout(() => {
             setRefreshing(false);
-        }, 2000);
-    }, []);
+        // }, 2000);
+    }, [page]);
 
     const getBlogs = async () => {
         try {
-            const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/home`)
-            setPostsList(response.data)
+            const response = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/home`, {
+                params:{
+                    page:1,
+                    limit:2
+                }
+            })
+            setPostsList(response.data.data)
+            setTotalPages(response.data.totalPages)
         } catch (error) {
             console.error('Error fetching blogs:', error);
         } finally {
@@ -47,46 +58,47 @@ const HomePage = () => {
         }, [])
     )
 
-    const handleScroll = ({ contentOffset, contentSize, layoutMeasurement }) => {
-        const isBottom = contentOffset.y + layoutMeasurement.height >= contentSize.height - 10;
-        if (isBottom && !isAtBottom && isScrollEnabled) {
-            setIsAtBottom(true);
-            setIsScrollEnabled(false)
-            console.log('Reached bottom');
-            if (scrollViewRef.current) {
-                scrollViewRef.current.scrollToEnd({ animated: true });
-            }
-            if (debounceTimer.current) {
-                clearTimeout(debounceTimer.current);
-            }
-
-            debounceTimer.current = setTimeout(() => {
-                setPostsList((prevPostList) => [
-                    ...prevPostList,
-                    {
-                        post_id: uuid.v4(),
-                        data: {
-                            blog_title: 'title1',
-                            description: 'Long description...',
-                        },
-                        user_id: 'user1',
-                        username: 'username1',
-                        img: 'redux',
-                        caption: 'caption1',
-                        likes: ['user2', 'user3'],
-                        comments: [{ user_id: 'user3', username: 'username3', comment: 'comment1 by user3' }],
-                    },
-                ]);
-
-                setIsAtBottom(false);
-                setIsScrollEnabled(true);
-                if (scrollViewRef.current) {
-                    scrollViewRef.current.scrollTo({ y: contentOffset.y + 300, animated: true });
-                }
-            }, 2000);
+    const fetchPostsDebounce = async (pageNumber = 1) => {
+        try {
+            const res = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/home?page=${pageNumber}&limit=2`);
+            setTotalPages(res.data.totalPages)
+            return res.data.data || [];
+        } catch (err) {
+            console.error('Error fetching posts:', err.message);
+            return [];
         }
     };
 
+    // 🧩 Scroll Handler
+    const handleScroll = async ({ contentOffset, contentSize, layoutMeasurement }) => {
+        const isBottom = contentOffset.y + layoutMeasurement.height >= contentSize.height - 10;
+        console.log("conditionsssssss", isBottom , isAtBottom , isScrollEnabled)
+        if (isBottom && !isAtBottom && isScrollEnabled) {
+            setIsAtBottom(true);
+            setIsScrollEnabled(false);
+            console.log('Reached bottom, fetching next page...', page, totalPages);
+
+            if(page !== totalPages){
+
+                const nextPage = page + 1;
+                const newPosts = await fetchPostsDebounce(nextPage);
+    
+                if (newPosts.length > 0) {
+                    setPostsList((prev) => [...prev, ...newPosts]);
+                    setPage(nextPage);
+                }
+    
+                setIsAtBottom(false);
+                setIsScrollEnabled(true);
+    
+                if (scrollViewRef.current) {
+                    scrollViewRef.current.scrollTo({ y: contentOffset.y + 200, animated: true });
+                }
+            }
+        }
+    };
+
+    // ⏱ Debounce helper
     const debounce = (func, delay) => {
         return (...args) => {
             clearTimeout(debounceTimer.current);
@@ -94,10 +106,13 @@ const HomePage = () => {
         };
     };
 
-    const handlescrollbottom = useCallback(debounce((event) => {
-        const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
-        handleScroll({ contentOffset, contentSize, layoutMeasurement });
-    }, 500), []);
+    const handleScrollBottom = useCallback(
+        debounce((event) => {
+            const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+            handleScroll({ contentOffset, contentSize, layoutMeasurement });
+        }, 500),
+        [page, postsList]
+    );
 
     if (isLoading) {
         return (
@@ -120,7 +135,7 @@ const HomePage = () => {
                 ref={scrollViewRef} 
                 onScroll={(event) => { 
                     if (Platform.OS !== 'web') event.persist();
-                     handlescrollbottom(event)
+                    handleScrollBottom(event)
                  }} 
                 scrollEventThrottle={16} 
                 contentContainerStyle={{ paddingBottom: 20 }}
@@ -129,8 +144,13 @@ const HomePage = () => {
                 <PostsContainer scrollEnabled={scrollEnabled} setScrollEnabled={setScrollEnabled} postsList={postsList} />
                 {isAtBottom && (
                     <View className="py-6 flex-row justify-center items-center">
+                        {page !== totalPages ? <>
                         <ActivityIndicator size="small" color="#fb923c" />
                         <Text className='ml-2 text-gray-600'>Loading more posts...</Text>
+                        </>:
+                            <Text className='ml-2 text-gray-600'>You've reached the end!</Text>
+
+                        }
                     </View>
                 )}
             </ScrollView>

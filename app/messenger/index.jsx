@@ -37,8 +37,8 @@ const index = () => {
   const { ws, socketID, connectSocket } = useSocketContext()
 
   const [chats, setChats] = useState([])
+  console.log('currentuserrrrrrrrrrrrrrrrrrrrrrrrr in get chats', chats, unread)
   const getChats = async () => {
-    // console.log('currentuserrrrrrrrrrrrrrrrrrrrrrrrr in get chats', currentUser)
     if (!currentUser?.username) return; // Guard clause
     try {
       const res = await axios.get(`${process.env.EXPO_PUBLIC_BASE_URL}/getChats`, {
@@ -53,9 +53,9 @@ const index = () => {
     }
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     getChats();
-  },[])
+  }, [])
   // useFocusEffect(
   //   useCallback(() => {
   //     // console.log('Fetching chats...');
@@ -74,7 +74,7 @@ const index = () => {
         const user = chats.find(c => c.participants.includes(username) && username !== currentUser.username);
         console.log('user', user)
         if (!user) return prev;
-  
+
         if (status === "online") {
           const alreadyOnline = prev.some(u => u.username === username);
           if (!alreadyOnline) return [...prev, { username }];
@@ -85,9 +85,9 @@ const index = () => {
         return prev;
       });
     }
-  
+
     ws.on('update-user-status', handleStatus);
-  
+
     return () => {
       ws.off('update-user-status', handleStatus);
     };
@@ -156,6 +156,60 @@ const index = () => {
           const otherUser = item.participants.find(x => x !== currentUser.username);
           const userUnreadMessages = unread[otherUser] || [];
           const hasUnread = userUnreadMessages.length > 0;
+          const utcDate = new Date(item.updatedAt);
+
+          function formatPostTime(dateString) {
+            const date = new Date(dateString);
+            if (isNaN(date)) return "";
+
+            // IST offset
+            const istOffset = 5.5 * 60 * 60 * 1000; // 5 hours 30 minutes
+            const istTime = new Date(date.getTime() + istOffset);
+
+            const now = new Date();
+            const istNow = new Date(now.getTime() + istOffset);
+
+            // Compare dates
+            const isToday =
+              istTime.getUTCFullYear() === istNow.getUTCFullYear() &&
+              istTime.getUTCMonth() === istNow.getUTCMonth() &&
+              istTime.getUTCDate() === istNow.getUTCDate();
+
+            const yesterday = new Date(istNow);
+            yesterday.setUTCDate(istNow.getUTCDate() - 1);
+
+            const isYesterday =
+              istTime.getUTCFullYear() === yesterday.getUTCFullYear() &&
+              istTime.getUTCMonth() === yesterday.getUTCMonth() &&
+              istTime.getUTCDate() === yesterday.getUTCDate();
+
+            if (isToday) {
+              const hh = String(istTime.getUTCHours()).padStart(2, "0");
+              const mm = String(istTime.getUTCMinutes()).padStart(2, "0");
+              return `${hh}:${mm}`;
+            } else if (isYesterday) {
+              return "yesterday";
+            } else {
+              const dd = String(istTime.getUTCDate()).padStart(2, "0");
+              const mm = String(istTime.getUTCMonth() + 1).padStart(2, "0");
+              const yy = String(istTime.getUTCFullYear()).slice(-2);
+              return `${dd}/${mm}/${yy}`; 
+            }
+          }
+
+
+
+
+
+
+          // Convert to IST
+          const timeString = formatPostTime(hasUnread ? userUnreadMessages[userUnreadMessages.length - 1].updatedAt : item.updatedAt);
+
+          if (i == 0) {
+
+            console.log("item.lastMessage.message", item.updatedAt)
+          }
+          console.log("item.lastMessage", userUnreadMessages[userUnreadMessages.length - 1])
           return (
             // Using Pressable for better feedback on touch
             <Pressable
@@ -181,7 +235,7 @@ const index = () => {
                     className={hasUnread ? 'text-orange-500 font-bold' : 'text-gray-500'}
                   >
                     {hasUnread
-                      ? userUnreadMessages[userUnreadMessages.length - 1]
+                      ? userUnreadMessages[userUnreadMessages.length - 1]?.message
                       : item.lastMessage.message
                     }
                   </Text>
@@ -189,7 +243,7 @@ const index = () => {
               </View>
 
               <View className="items px-4">
-                <Text className='text-gray-400 text-xs mb-1'>11:30</Text>
+                <Text className='text-gray-400 text-xs mb-1'>{timeString}</Text>
                 {hasUnread &&
                   <View className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center">
                     <Text className="text-white font-bold text-xs">{userUnreadMessages.length}</Text>

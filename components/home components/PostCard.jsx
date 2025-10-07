@@ -47,7 +47,7 @@ const PostCard = ({ post, scrollEnabled, setScrollEnabled }) => {
     }
 
     return (
-        <View className='mb- bg-white rounded- border-t border-gray-100  overflow-hidden shadow-sm mx- mt-'>
+        <View key={post._id} className='mb- bg-white rounded- border-t border-gray-100  overflow-hidden shadow-sm mx- mt-'>
             {/* Author Header */}
             <Pressable 
                 onPress={() => router.push(`/profile_page/${post.authorId}`)} 

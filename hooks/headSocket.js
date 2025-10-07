@@ -41,7 +41,7 @@ export const SocketProvider = ({ children }) => {
                   // console.log('new me', data, [...(unread[data.newMessage.from] || []), data.newMessage.message])
                   setUnread((prev) => ({
                     ...prev,
-                    [data.newMessage.from]: [...(prev[data.newMessage.from] || []), data.newMessage.message]
+                    [data.newMessage.from]: [...(prev[data.newMessage.from] || []), data.newMessage]
                   }));
                 }
                 else if (!data.status) {
